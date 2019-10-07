@@ -10,7 +10,9 @@ class FormButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(left: 50, right: 50),
+       margin: EdgeInsets.fromLTRB(100, 10, 100, 10),
+      height: 50,
+      width: 1.0 / 0.0,
       decoration: BoxDecoration(
         color: AppColors.greenAccent,
         borderRadius: BorderRadius.circular(25),
