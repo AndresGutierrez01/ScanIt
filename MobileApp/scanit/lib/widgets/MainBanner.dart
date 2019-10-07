@@ -5,7 +5,7 @@ class MainBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(left: 30, right: 30),
+      padding: EdgeInsets.only(left: 50, right: 50),
       decoration: BoxDecoration(
           color: AppColors.blue, borderRadius: BorderRadius.circular(5)),
       child: Text("SCANIT",

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../widgets/MainBanner.dart';
 import '../widgets/LoginForm.dart';
 import '../widgets/FormButton.dart';
+import '../widgets/TextButton.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -13,7 +14,11 @@ class LoginState extends State<Login> {
   TextEditingController password = TextEditingController();
 
   login(){
+    print("Logging in....");
+  }
 
+  signUp(){
+    print("Routing to sign up page");
   }
 
   @override
@@ -28,7 +33,8 @@ class LoginState extends State<Login> {
             children: <Widget>[
               MainBanner(),
               LoginForm(emailController: email,passwordController: password,),
-              FormButton(text: "Login", onTap: login())
+              FormButton(text: "Login", onTap: login),
+              TextButton(text: "Don't have an account? Sign up here!", onTap: signUp,)
             ],
           ),
         ),
