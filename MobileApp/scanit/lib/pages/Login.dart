@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/MainBanner.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -6,14 +7,21 @@ class Login extends StatefulWidget {
 }
 
 class LoginState extends State<Login> {
-
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: Container(
-        
-      ) 
+          child: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              MainBanner(),
+            ],
+          ),
+        ),
+      )),
     );
   }
 }

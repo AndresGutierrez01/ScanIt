@@ -35,6 +35,10 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
+  fonts:
+    - family: Mansalva
+      fonts: 
+        - asset: assets/fonts/Mansalva-Regular.ttf
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
