@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/MainBanner.dart';
 import '../widgets/LoginForm.dart';
+import '../widgets/FormButton.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -10,6 +11,11 @@ class Login extends StatefulWidget {
 class LoginState extends State<Login> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
+
+  login(){
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,11 +23,12 @@ class LoginState extends State<Login> {
           child: Center(
         child: SingleChildScrollView(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               MainBanner(),
-              LoginForm(emailController: email,passwordController: password,)
+              LoginForm(emailController: email,passwordController: password,),
+              FormButton(text: "Login", onTap: login())
             ],
           ),
         ),
