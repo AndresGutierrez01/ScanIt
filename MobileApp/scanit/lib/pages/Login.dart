@@ -28,12 +28,15 @@ class LoginState extends State<Login> {
           child: Center(
         child: SingleChildScrollView(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               MainBanner(),
+              Padding(padding: EdgeInsets.all(30),),
               LoginForm(emailController: email,passwordController: password,),
+              Padding(padding: EdgeInsets.all(10),),
               FormButton(text: "Login", onTap: login),
+              Padding(padding: EdgeInsets.all(5),),
               TextButton(text: "Don't have an account? Sign up here!", onTap: signUp,)
             ],
           ),
