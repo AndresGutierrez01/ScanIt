@@ -3,9 +3,9 @@ import 'package:scanit/utilites/AppColors.dart';
 
 class TextButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback onTap;
 
-  TextButton({@required this.text, @required this.onPressed});
+  TextButton({@required this.text, @required this.onTap});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -15,7 +15,7 @@ class TextButton extends StatelessWidget {
           text,
           style: TextStyle(color: AppColors.gray),
         ),
-        onPressed: this.onPressed,
+        onPressed: this.onTap,
       ),
     );
   }

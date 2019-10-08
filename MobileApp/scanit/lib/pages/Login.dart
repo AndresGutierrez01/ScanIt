@@ -3,7 +3,10 @@ import 'package:scanit/utilites/AppColors.dart';
 import 'package:scanit/widgets/LoginForm.dart';
 import 'package:scanit/widgets/FormButton.dart';
 import 'package:scanit/widgets/MainBanner.dart';
+import 'package:scanit/widgets/SlideRightRoute.dart';
 import 'package:scanit/widgets/TextButton.dart';
+
+import 'SignUp.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -23,7 +26,9 @@ class _LoginState extends State<Login> {
   }
 
   signUp() {
-    print("Routing to sign up page");
+    Navigator.of(context).pushReplacement(
+      SlideRightRoute(widget: SignUp()),
+    );
   }
 
   @override
@@ -47,11 +52,11 @@ class _LoginState extends State<Login> {
                   Padding(padding: EdgeInsets.all(10),),
                   TextButton(
                     text: "Forgot password? Tap here!",
-                    onPressed: forgotPassword,
+                    onTap: forgotPassword,
                   ),
                   TextButton(
                     text: "Don't have an account? Sign up here!",
-                    onPressed: signUp,
+                    onTap: signUp,
                   ),
                 ],
               ),

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:scanit/utilites/AppColors.dart';
+import 'package:scanit/widgets/FormButton.dart';
 import 'package:scanit/widgets/MainBanner.dart';
+import 'package:scanit/widgets/SlideLeftRoute.dart';
+import 'package:scanit/widgets/TextButton.dart';
+
+import 'Login.dart';
 
 class SignUp extends StatefulWidget {
   @override
@@ -8,6 +13,15 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
+  signUp(){
+
+  }
+  login() {
+    Navigator.of(context).pushReplacement(
+      SlideLeftRoute(widget: Login()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,7 +34,15 @@ class _SignUpState extends State<SignUp> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 MainBanner(),
-                Padding(padding: EdgeInsets.all(20),),
+                Padding(
+                  padding: EdgeInsets.all(20),
+                ),
+                FormButton(text: "SIGN UP", onTap: signUp),
+                Padding(padding: EdgeInsets.all(10),),
+                TextButton(
+                  text: "Already have an account? Log in here!",
+                  onTap: login,
+                )
               ],
             ),
           ),
