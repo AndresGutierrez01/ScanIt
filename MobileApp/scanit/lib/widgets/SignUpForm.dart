@@ -62,7 +62,7 @@ class SignUpForm extends StatelessWidget {
             style: TextStyle(color: AppColors.white),
             decoration: InputDecoration(
                 prefixIcon: Icon(
-                  Icons.lock_outline,
+                  Icons.lock,
                   color: AppColors.gray,
                 ),
                 hintText: "Confirm Password",
