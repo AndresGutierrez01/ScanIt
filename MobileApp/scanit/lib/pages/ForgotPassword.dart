@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scanit/utilites/AppColors.dart';
+import 'package:scanit/widgets/ForgotPasswordForm.dart';
 import 'package:scanit/widgets/FormButton.dart';
 import 'package:scanit/widgets/MainBanner.dart';
 import 'package:scanit/widgets/SlideLeftRoute.dart';
@@ -40,6 +41,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 Padding(
                   padding: EdgeInsets.all(20),
                 ),
+                ForgotPasswordForm(emailCtr: email,),
                 FormButton(text: "RESET PASSWORD", onTap: resetPassword),
                 Padding(padding: EdgeInsets.all(10),),
                 TextButton(
