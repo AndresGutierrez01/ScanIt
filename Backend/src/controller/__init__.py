@@ -1,1 +1,2 @@
 from .helloWorldController import HelloWorldController
+from .recieveImageController import RecieveImageController
