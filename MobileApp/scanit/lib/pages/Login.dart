@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../widgets/MainBanner.dart';
-import '../widgets/LoginForm.dart';
-import '../widgets/FormButton.dart';
-import '../widgets/TextButton.dart';
+import 'package:scanit/utilites/AppColors.dart';
+import 'package:scanit/widgets/LoginForm.dart';
+import 'package:scanit/widgets/FormButton.dart';
+import 'package:scanit/widgets/TextButton.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -13,11 +13,15 @@ class LoginState extends State<Login> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
 
-  login(){
+  login() {
     print("Logging in....");
   }
 
-  signUp(){
+  forgotPassword(){
+
+  }
+
+  signUp() {
     print("Routing to sign up page");
   }
 
@@ -25,23 +29,39 @@ class LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+          color: AppColors.background,
           child: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              MainBanner(),
-              Padding(padding: EdgeInsets.all(30),),
-              LoginForm(emailController: email,passwordController: password,),
-              Padding(padding: EdgeInsets.all(10),),
-              FormButton(text: "Login", onTap: login),
-              Padding(padding: EdgeInsets.all(5),),
-              TextButton(text: "Don't have an account? Sign up here!", onTap: signUp,)
-            ],
-          ),
-        ),
-      )),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "SCANIT",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: AppColors.gray
+                    )
+                    ),
+                  Padding(padding: EdgeInsets.all(20),),
+                  LoginForm(
+                    emailCtr: email,
+                    passwordCtr: password,
+                  ),
+                  FormButton(text: "LOG IN", onTap: login),
+                  Padding(padding: EdgeInsets.all(10),),
+                  TextButton(
+                    text: "Forgot password? Tap here!",
+                    onPressed: forgotPassword,
+                  ),
+                  TextButton(
+                    text: "Don't have an account? Sign up here!",
+                    onPressed: signUp,
+                  ),
+                ],
+              ),
+            ),
+          )),
     );
   }
 }

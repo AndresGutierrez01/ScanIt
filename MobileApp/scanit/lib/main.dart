@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'pages/Login.dart';
+import 'package:scanit/pages/Login.dart';
+import 'package:scanit/utilites/AppColors.dart';
 
 void main() => runApp(MyApp());
 
@@ -7,9 +8,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       theme: ThemeData(
-        primaryColor: Colors.black,
+        primaryColor: AppColors.white,
+        fontFamily: 'Montserrat',
       ),
       home: Login(),
     );

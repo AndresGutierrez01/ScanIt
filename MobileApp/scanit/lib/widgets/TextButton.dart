@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:scanit/utilites/AppColors.dart';
 
 class TextButton extends StatelessWidget {
   final String text;
-  final VoidCallback onTap;
+  final VoidCallback onPressed;
 
-  TextButton({@required this.text, @required this.onTap});
-
+  TextButton({@required this.text, @required this.onPressed});
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 50,
       child: FlatButton(
         child: Text(
-          this.text,
-          style: TextStyle(color: Colors.black),
+          text,
+          style: TextStyle(color: AppColors.gray),
         ),
-        onPressed: this.onTap,
+        onPressed: this.onPressed,
       ),
     );
   }
