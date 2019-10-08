@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scanit/utilites/AppColors.dart';
 import 'package:scanit/widgets/FormButton.dart';
 import 'package:scanit/widgets/MainBanner.dart';
+import 'package:scanit/widgets/SignUpForm.dart';
 import 'package:scanit/widgets/SlideLeftRoute.dart';
 import 'package:scanit/widgets/TextButton.dart';
 
@@ -13,6 +14,10 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
+  TextEditingController email = TextEditingController();
+  TextEditingController password = TextEditingController();
+  TextEditingController confirmPassword = TextEditingController();
+
   signUp(){
 
   }
@@ -36,6 +41,11 @@ class _SignUpState extends State<SignUp> {
                 MainBanner(),
                 Padding(
                   padding: EdgeInsets.all(20),
+                ),
+                SignUpForm(
+                  emailCtr: email,
+                  passwordCtr: password,
+                  passwordConfirmCtr: confirmPassword,
                 ),
                 FormButton(text: "SIGN UP", onTap: signUp),
                 Padding(padding: EdgeInsets.all(10),),
