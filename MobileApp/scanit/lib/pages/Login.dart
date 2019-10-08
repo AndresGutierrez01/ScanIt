@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:scanit/pages/ForgotPassword.dart';
 import 'package:scanit/utilites/AppColors.dart';
 import 'package:scanit/widgets/LoginForm.dart';
 import 'package:scanit/widgets/FormButton.dart';
@@ -22,7 +23,9 @@ class _LoginState extends State<Login> {
   }
 
   forgotPassword(){
-
+    Navigator.of(context).pushReplacement(
+      SlideRightRoute(widget: ForgotPassword()),
+    );
   }
 
   signUp() {
