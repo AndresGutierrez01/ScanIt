@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scanit/utilites/AppColors.dart';
 import 'package:scanit/widgets/LoginForm.dart';
 import 'package:scanit/widgets/FormButton.dart';
+import 'package:scanit/widgets/MainBanner.dart';
 import 'package:scanit/widgets/TextButton.dart';
 
 class Login extends StatefulWidget {
@@ -36,13 +37,7 @@ class LoginState extends State<Login> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Text(
-                    "SCANIT",
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: AppColors.gray
-                    )
-                    ),
+                  MainBanner(),
                   Padding(padding: EdgeInsets.all(20),),
                   LoginForm(
                     emailCtr: email,
