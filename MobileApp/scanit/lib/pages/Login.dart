@@ -7,10 +7,10 @@ import 'package:scanit/widgets/TextButton.dart';
 
 class Login extends StatefulWidget {
   @override
-  LoginState createState() => LoginState();
+  _LoginState createState() => _LoginState();
 }
 
-class LoginState extends State<Login> {
+class _LoginState extends State<Login> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
 
