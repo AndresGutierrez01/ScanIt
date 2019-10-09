@@ -1,6 +1,1 @@
-*/env/
-
-*.vscode/settings.json
-
-*.pyc
 .DS_STORE
