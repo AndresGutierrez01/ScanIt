@@ -25,4 +25,13 @@ class Auth{
       return e.code.toString();
     }
   }
+
+  static void sendVerificationEmail() async{
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    user.sendEmailVerification();
+  }
+  static Future<bool> isEmailVerified() async{
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    return user.isEmailVerified;
+  }
 }

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:scanit/pages/EmailVerification.dart';
 import 'package:scanit/utilites/AppColors.dart';
 import 'package:scanit/utilites/Auth.dart';
 import 'package:scanit/widgets/FormButton.dart';
 import 'package:scanit/widgets/MainBanner.dart';
 import 'package:scanit/widgets/SignUpForm.dart';
 import 'package:scanit/widgets/SlideLeftRoute.dart';
+import 'package:scanit/widgets/SlideRightRoute.dart';
 import 'package:scanit/widgets/TextButton.dart';
 
 import 'Login.dart';
@@ -32,9 +34,11 @@ class _SignUpState extends State<SignUp> {
         password: password.text,
         confirmPassword: confirmPassword.text);
 
-    print(uid);
     if (validUID(uid)) {
-      print("Sign Up successful");
+      Auth.sendVerificationEmail();
+      Navigator.of(context).pushReplacement(
+        SlideRightRoute(widget: EmailVerification(email: email.text,)),
+      );
     }
 
     setState(() {
@@ -67,10 +71,10 @@ class _SignUpState extends State<SignUp> {
       email.clear();
       error = "Email already in use";
       return false;
-    } else if(uid=="error"){
+    } else if (uid == "error") {
       error = "Empty field";
       return false;
-    }else{
+    } else {
       return true;
     }
   }

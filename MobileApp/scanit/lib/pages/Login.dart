@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:scanit/pages/EmailVerification.dart';
 import 'package:scanit/pages/ForgotPassword.dart';
 import 'package:scanit/pages/SignUp.dart';
 import 'package:scanit/utilites/AppColors.dart';
@@ -25,22 +26,28 @@ class _LoginState extends State<Login> {
 
   login() async {
     setState(() {
-     loading = true; 
+      loading = true;
     });
 
-    if(await Auth.login(email: email.text, password: password.text)){
-      print("login success!");
+    if (await Auth.login(email: email.text, password: password.text)) {
+      if (await Auth.isEmailVerified()) {
+        print("Login Successful");
+      } else {
+        Auth.sendVerificationEmail();
+        Navigator.of(context).pushReplacement(
+          SlideRightRoute(widget: EmailVerification(email: email.text,)),
+        );
+      }
     }
-  
 
     setState(() {
       password.clear();
       error = "Invalid email or password";
-      loading = false; 
+      loading = false;
     });
   }
 
-  forgotPassword(){
+  forgotPassword() {
     Navigator.of(context).pushReplacement(
       SlideRightRoute(widget: ForgotPassword()),
     );
@@ -64,7 +71,9 @@ class _LoginState extends State<Login> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   MainBanner(),
-                  Padding(padding: EdgeInsets.all(20),),
+                  Padding(
+                    padding: EdgeInsets.all(20),
+                  ),
                   LoginForm(
                     emailCtr: email,
                     passwordCtr: password,
@@ -72,13 +81,18 @@ class _LoginState extends State<Login> {
                   Padding(
                     padding: const EdgeInsets.all(15),
                     child: error != ""
-                    ?Text(error, style: TextStyle(color: AppColors.aqua),)
-                    :Text(""),
+                        ? Text(
+                            error,
+                            style: TextStyle(color: AppColors.aqua),
+                          )
+                        : Text(""),
                   ),
                   loading
-                  ?SpinKitWave(color: AppColors.white, size: 30.0)
-                  :FormButton(text: "LOG IN", onTap: login),
-                  Padding(padding: EdgeInsets.all(10),),
+                      ? SpinKitWave(color: AppColors.white, size: 30.0)
+                      : FormButton(text: "LOG IN", onTap: login),
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                  ),
                   TextButton(
                     text: "Forgot password? Tap here!",
                     onTap: forgotPassword,
