@@ -13,7 +13,7 @@ class SignUpForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(40),
+      margin: EdgeInsets.only(left: 40,right: 40),
       child: Column(
         children: <Widget>[
           TextField(

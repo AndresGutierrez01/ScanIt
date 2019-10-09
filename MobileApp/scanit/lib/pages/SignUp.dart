@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:scanit/utilites/AppColors.dart';
+import 'package:scanit/utilites/Auth.dart';
 import 'package:scanit/widgets/FormButton.dart';
 import 'package:scanit/widgets/MainBanner.dart';
 import 'package:scanit/widgets/SignUpForm.dart';
@@ -19,16 +20,59 @@ class _SignUpState extends State<SignUp> {
   TextEditingController password = TextEditingController();
   TextEditingController confirmPassword = TextEditingController();
   bool loading = false;
+  String error = "";
 
-  signUp(){
+  signUp() async {
     setState(() {
       loading = true;
     });
+
+    String uid = await Auth.signUp(
+        email: email.text,
+        password: password.text,
+        confirmPassword: confirmPassword.text);
+
+    print(uid);
+    if (validUID(uid)) {
+      print("Sign Up successful");
+    }
+
+    setState(() {
+      loading = false;
+    });
   }
+
   login() {
     Navigator.of(context).pushReplacement(
       SlideLeftRoute(widget: Login()),
     );
+  }
+
+  bool validUID(String uid) {
+    if (uid == "ERROR_PASSWORD_MATCH") {
+      password.clear();
+      confirmPassword.clear();
+      error = "Passwords do not match";
+      return false;
+    } else if (uid == "ERROR_INVALID_EMAIL") {
+      email.clear();
+      error = "Invalid email";
+      return false;
+    } else if (uid == "ERROR_WEAK_PASSWORD") {
+      password.clear();
+      confirmPassword.clear();
+      error = "Password must be at least 6 characters";
+      return false;
+    } else if (uid == "ERROR_EMAIL_ALREADY_IN_USE") {
+      email.clear();
+      error = "Email already in use";
+      return false;
+    } else if(uid=="error"){
+      error = "Empty field";
+      return false;
+    }else{
+      return true;
+    }
   }
 
   @override
@@ -51,10 +95,21 @@ class _SignUpState extends State<SignUp> {
                   passwordCtr: password,
                   passwordConfirmCtr: confirmPassword,
                 ),
+                Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: error != ""
+                      ? Text(
+                          error,
+                          style: TextStyle(color: AppColors.aqua),
+                        )
+                      : Text(""),
+                ),
                 loading
-                ?SpinKitWave(color: AppColors.white, size: 30.0)
-                :FormButton(text: "SIGN UP", onTap: signUp),
-                Padding(padding: EdgeInsets.all(10),),
+                    ? SpinKitWave(color: AppColors.white, size: 30.0)
+                    : FormButton(text: "SIGN UP", onTap: signUp),
+                Padding(
+                  padding: EdgeInsets.all(10),
+                ),
                 TextButton(
                   text: "Already have an account? Log in here!",
                   onTap: login,
