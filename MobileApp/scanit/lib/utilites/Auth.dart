@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 class Auth{
   static Future<bool> login({String email, String password}) async {
@@ -23,6 +24,14 @@ class Auth{
       return auth.user.uid;
     } catch (e) {
       return e.code.toString();
+    }
+  }
+  static Future<bool> resetPassword({@required String email}) async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 
