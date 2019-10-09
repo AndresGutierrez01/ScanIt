@@ -6,5 +6,4 @@ from src.controller import *
 api = Api(REST)
 
 
-api.add_resource(HelloWorldController, "/api/hello")
 api.add_resource(RecieveImageController, "/image")
