@@ -1,8 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:scanit/pages/ForgotPassword.dart';
 import 'package:scanit/pages/SignUp.dart';
 import 'package:scanit/utilites/AppColors.dart';
+import 'package:scanit/utilites/Auth.dart';
 import 'package:scanit/widgets/LoginForm.dart';
 import 'package:scanit/widgets/FormButton.dart';
 import 'package:scanit/widgets/MainBanner.dart';
@@ -18,10 +21,22 @@ class _LoginState extends State<Login> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
   bool loading = false;
+  String error = "";
 
-  login() {
+  login() async {
     setState(() {
      loading = true; 
+    });
+
+    if(await Auth.login(email: email.text, password: password.text)){
+      print("login success!");
+    }
+  
+
+    setState(() {
+      password.clear();
+      error = "Invalid email or password";
+      loading = false; 
     });
   }
 
@@ -53,6 +68,12 @@ class _LoginState extends State<Login> {
                   LoginForm(
                     emailCtr: email,
                     passwordCtr: password,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(15),
+                    child: error != ""
+                    ?Text(error, style: TextStyle(color: AppColors.aqua),)
+                    :Text(""),
                   ),
                   loading
                   ?SpinKitWave(color: AppColors.white, size: 30.0)
