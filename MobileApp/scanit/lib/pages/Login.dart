@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:scanit/pages/ForgotPassword.dart';
+import 'package:scanit/pages/SignUp.dart';
 import 'package:scanit/utilites/AppColors.dart';
 import 'package:scanit/widgets/LoginForm.dart';
 import 'package:scanit/widgets/FormButton.dart';
 import 'package:scanit/widgets/MainBanner.dart';
 import 'package:scanit/widgets/SlideRightRoute.dart';
 import 'package:scanit/widgets/TextButton.dart';
-
-import 'SignUp.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -17,9 +17,12 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
+  bool loading = false;
 
   login() {
-    print("Logging in....");
+    setState(() {
+     loading = true; 
+    });
   }
 
   forgotPassword(){
@@ -51,7 +54,9 @@ class _LoginState extends State<Login> {
                     emailCtr: email,
                     passwordCtr: password,
                   ),
-                  FormButton(text: "LOG IN", onTap: login),
+                  loading
+                  ?SpinKitWave(color: AppColors.white, size: 30.0)
+                  :FormButton(text: "LOG IN", onTap: login),
                   Padding(padding: EdgeInsets.all(10),),
                   TextButton(
                     text: "Forgot password? Tap here!",

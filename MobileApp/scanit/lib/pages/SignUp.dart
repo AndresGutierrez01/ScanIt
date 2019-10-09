@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:scanit/utilites/AppColors.dart';
 import 'package:scanit/widgets/FormButton.dart';
 import 'package:scanit/widgets/MainBanner.dart';
@@ -17,9 +18,12 @@ class _SignUpState extends State<SignUp> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
   TextEditingController confirmPassword = TextEditingController();
+  bool loading = false;
 
   signUp(){
-
+    setState(() {
+      loading = true;
+    });
   }
   login() {
     Navigator.of(context).pushReplacement(
@@ -47,7 +51,9 @@ class _SignUpState extends State<SignUp> {
                   passwordCtr: password,
                   passwordConfirmCtr: confirmPassword,
                 ),
-                FormButton(text: "SIGN UP", onTap: signUp),
+                loading
+                ?SpinKitWave(color: AppColors.white, size: 30.0)
+                :FormButton(text: "SIGN UP", onTap: signUp),
                 Padding(padding: EdgeInsets.all(10),),
                 TextButton(
                   text: "Already have an account? Log in here!",

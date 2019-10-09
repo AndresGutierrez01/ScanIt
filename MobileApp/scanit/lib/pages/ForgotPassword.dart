@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:scanit/utilites/AppColors.dart';
 import 'package:scanit/widgets/ForgotPasswordForm.dart';
 import 'package:scanit/widgets/FormButton.dart';
@@ -15,10 +16,13 @@ class ForgotPassword extends StatefulWidget {
 
 class _ForgotPasswordState extends State<ForgotPassword> {
   TextEditingController email = TextEditingController();
+  bool loading = false;
 
 
   resetPassword(){
-
+    setState(() {
+     loading = true; 
+    });
   }
   login() {
     Navigator.of(context).pushReplacement(
@@ -42,7 +46,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   padding: EdgeInsets.all(20),
                 ),
                 ForgotPasswordForm(emailCtr: email,),
-                FormButton(text: "RESET PASSWORD", onTap: resetPassword),
+                loading
+                ?SpinKitWave(color: AppColors.white, size: 30.0)
+                :FormButton(text: "RESET PASSWORD", onTap: resetPassword),
                 Padding(padding: EdgeInsets.all(10),),
                 TextButton(
                   text: "Password reset? Log in here!",
