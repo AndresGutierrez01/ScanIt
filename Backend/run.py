@@ -1,6 +1,5 @@
 from src.controller import *
 from flask import Flask
-import controller
 from flask_restful import Resource, Api
 
 
