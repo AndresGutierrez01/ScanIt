@@ -1,5 +1,18 @@
-from src import REST
+from src.controller import *
+from flask import Flask
 import controller
+from flask_restful import Resource, Api
+
+
+def create_app():
+    app = Flask(__name__)
+    api = Api(app)
+
+    api.add_resource(RecieveImageController, "/image")    
+
+    return app
+
 
 if __name__ == '__main__':
-    REST.run()
+    app.create_app()
+    app.run()
