@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>866933078576-acthf6mrju9q7tnhmu8bo8m316lqr67e.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.866933078576-acthf6mrju9q7tnhmu8bo8m316lqr67e</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDBSRmQneePmTRz4AJEKNL0rSZwOe00Eo8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>866933078576</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.scanit</string>
+	<key>PROJECT_ID</key>
+	<string>scanit-9ab4d</string>
+	<key>STORAGE_BUCKET</key>
+	<string>scanit-9ab4d.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:866933078576:ios:69283c38fca588ab870bf5</string>
+	<key>DATABASE_URL</key>
+	<string>https://scanit-9ab4d.firebaseio.com</string>
+</dict>
+</plist>

@@ -4,14 +4,20 @@
 # Uncomment this line to define a global platform for your project
 # platform :ios, '9.0'
 
+# add the Firebase pod for Google Analytics
+pod 'Firebase/Analytics'
+# add pods for any other desired Firebase products
+# https://firebase.google.com/docs/ios/setup#available-pods
+
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
-project 'Runner', {
-  'Debug' => :debug,
-  'Profile' => :release,
-  'Release' => :release,
-}
+# Uncomment this line to define a global platform for your project
+# platform :ios, '9.0'
+
+# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+pod 'Firebase/Auth'
 
 def parse_KV_file(file, separator='=')
   file_abs_path = File.expand_path(file)
