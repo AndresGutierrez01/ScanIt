@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:scanit/Database_Classes/teacher.dart';
 import 'package:scanit/pages/Courses.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:scanit/Database_Classes/course.dart';
 
 class CourseList extends StatefulWidget {
   final Teacher teacher;
@@ -28,12 +26,12 @@ class _CourseListState extends State<CourseList>{
                   child: ListTile(
                     title: Padding(
                       padding: const EdgeInsets.only(left: 36.5),
-                      child: Text(/*Add Stuff Here as well*/),
+                      //child: Text(/*Add Stuff Here as well*/),
                     ),
                     trailing: Icon(Icons.keyboard_arrow_right),
                     onTap: () {
-                      Navigator.pushNamed(context, 'coursePage',
-                          arguments: Course( /*ADD Stuff here*/));
+                      /* Navigator.pushNamed(context, 'coursePage',
+                          arguments: Course( /*ADD Stuff here*/)); */
                     },
                   ),
                 );
