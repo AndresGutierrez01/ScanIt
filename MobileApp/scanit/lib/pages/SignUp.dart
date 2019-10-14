@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:scanit/pages/EmailVerification.dart';
+import 'package:scanit/pages/Login.dart';
 import 'package:scanit/utilites/AppColors.dart';
 import 'package:scanit/utilites/Auth.dart';
 import 'package:scanit/widgets/FormButton.dart';
@@ -9,8 +10,6 @@ import 'package:scanit/widgets/SignUpForm.dart';
 import 'package:scanit/widgets/SlideLeftRoute.dart';
 import 'package:scanit/widgets/SlideRightRoute.dart';
 import 'package:scanit/widgets/TextButton.dart';
-
-import 'Login.dart';
 
 class SignUp extends StatefulWidget {
   @override
