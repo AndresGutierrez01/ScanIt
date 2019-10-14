@@ -4,6 +4,8 @@ import 'package:scanit/pages/Login.dart';
 import 'package:scanit/utilites/AppColors.dart';
 import 'package:scanit/utilites/Auth.dart';
 import 'package:scanit/utilites/FirestoreStreams.dart';
+import 'package:scanit/widgets/CenterLoad.dart';
+import 'package:scanit/widgets/ClassTile.dart';
 import 'package:scanit/widgets/SlideLeftRoute.dart';
 
 class Classes extends StatefulWidget {
@@ -68,7 +70,18 @@ class _ClassesState extends State<Classes> {
                       Text("No Classes", style: TextStyle(color: AppColors.gray)),
                 );
               }
+              return ListView.builder(
+                itemCount: classDocs.length,
+                itemBuilder: (context, index){
+                  return ClassTile(
+                    classData: classDocs[index].data,
+                    classId: 'asdfsd',
+                
+                  );
+                },
+              );
             }
+            return CenterLoad();
           },
         ),
       ),
