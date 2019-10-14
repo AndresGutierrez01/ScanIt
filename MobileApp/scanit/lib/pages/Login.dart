@@ -1,5 +1,4 @@
-import 'dart:math';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:scanit/pages/EmailVerification.dart';
@@ -12,6 +11,7 @@ import 'package:scanit/widgets/FormButton.dart';
 import 'package:scanit/widgets/MainBanner.dart';
 import 'package:scanit/widgets/SlideRightRoute.dart';
 import 'package:scanit/widgets/TextButton.dart';
+import 'package:scanit/pages/courses.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -31,7 +31,10 @@ class _LoginState extends State<Login> {
 
     if (await Auth.login(email: email.text, password: password.text)) {
       if (await Auth.isEmailVerified()) {
-        print("Login Successful");
+        FirebaseUser u = await FirebaseAuth.instance.currentUser();
+        Navigator.of(context).pushReplacement(
+          SlideRightRoute(widget: Course(course:u.uid.toString())),
+        );
       } else {
         Auth.sendVerificationEmail();
         Navigator.of(context).pushReplacement(
