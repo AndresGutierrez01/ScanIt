@@ -11,7 +11,6 @@ import 'package:scanit/widgets/FormButton.dart';
 import 'package:scanit/widgets/MainBanner.dart';
 import 'package:scanit/widgets/SlideRightRoute.dart';
 import 'package:scanit/widgets/TextButton.dart';
-import 'package:scanit/pages/courses.dart';
 
 class Login extends StatefulWidget {
   @override

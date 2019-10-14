@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:scanit/pages/Login.dart';
 import 'package:scanit/utilites/AppColors.dart';
 import 'package:scanit/utilites/Auth.dart';
+import 'package:scanit/utilites/FirestoreStreams.dart';
 import 'package:scanit/widgets/SlideLeftRoute.dart';
 
 class Classes extends StatefulWidget {
@@ -54,16 +56,22 @@ class _ClassesState extends State<Classes> {
         ],
       ),
       body: Container(
-          color: AppColors.background,
-          child: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[Text(Auth.uid)],
-              ),
-            ),
-          )),
+        color: AppColors.background,
+        child: StreamBuilder<QuerySnapshot>(
+          stream: FirestoreStreams.classesStream(),
+          builder: (context, classes) {
+            if (classes.hasData) {
+              List classDocs = classes.data.documents;
+              if (classDocs.isEmpty) {
+                return Center(
+                  child:
+                      Text("No Classes", style: TextStyle(color: AppColors.gray)),
+                );
+              }
+            }
+          },
+        ),
+      ),
     );
   }
 }
