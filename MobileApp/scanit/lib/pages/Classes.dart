@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:scanit/pages/Class.dart';
 import 'package:scanit/pages/Login.dart';
 import 'package:scanit/utilites/AppColors.dart';
 import 'package:scanit/utilites/Auth.dart';
@@ -77,7 +78,7 @@ class _ClassesState extends State<Classes> {
     Navigator.of(context).pop();
   }
 
-  editClassDialog(String classId, Map classData){
+  editClassDialog(String classId, Map classData) {
     className.text = classData['name'];
     classSection.text = classData['section'];
     classNumber.text = classData['number'];
@@ -96,7 +97,7 @@ class _ClassesState extends State<Classes> {
     );
   }
 
-  editClass(String classId){
+  editClass(String classId) {
     FirestoreTasks.editClass(
         classId, className.text, classNumber.text, classSection.text);
     Navigator.of(context).pop();
@@ -107,6 +108,12 @@ class _ClassesState extends State<Classes> {
     Auth.logout();
     Navigator.of(context).pushReplacement(
       SlideLeftRoute(widget: Login()),
+    );
+  }
+
+  viewClass(String className, String classId) {
+    Navigator.of(context).push(
+      SlideRightRoute(widget: Class(title: className, id: classId)),
     );
   }
 
@@ -159,6 +166,7 @@ class _ClassesState extends State<Classes> {
                     classId: classDocs[index].documentID,
                     onDelete: deleteWarning,
                     onEdit: editClassDialog,
+                    onTap: viewClass,
                   );
                 },
               );

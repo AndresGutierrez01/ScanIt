@@ -5,13 +5,13 @@ import 'package:scanit/utilites/AppColors.dart';
 class ClassTile extends StatelessWidget {
   final Map classData;
   final String classId;
-  //final Function(String) onTap;
+  final Function(String,String) onTap;
   final Function(String) onDelete;
   final Function(String, Map) onEdit;
   ClassTile({
     @required this.classData,
     @required this.classId,
-    //@required this.onTap,
+    @required this.onTap,
     @required this.onDelete,
     @required this.onEdit
   });
@@ -37,7 +37,7 @@ class ClassTile extends StatelessWidget {
         )
       ],
       child: GestureDetector(
-        // onTap: () => onTap(classId),
+        onTap: () => onTap(classData['name'], classId),
         child: Container(
             margin: EdgeInsets.all(10),
             decoration: BoxDecoration(
