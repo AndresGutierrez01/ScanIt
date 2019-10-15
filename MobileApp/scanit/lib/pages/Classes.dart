@@ -33,6 +33,7 @@ class _ClassesState extends State<Classes> {
   }
 
   createClassDialog() {
+    clearControllers();
     showDialog<void>(
       barrierDismissible: false,
       context: context,
@@ -101,7 +102,6 @@ class _ClassesState extends State<Classes> {
     FirestoreTasks.editClass(
         classId, className.text, classNumber.text, classSection.text);
     Navigator.of(context).pop();
-    clearControllers();
   }
 
   logout() {
