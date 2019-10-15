@@ -7,13 +7,13 @@ class ClassTile extends StatelessWidget {
   final String classId;
   //final Function(String) onTap;
   final Function(String) onDelete;
-  //final Function(String) onEdit;
+  final Function(String, Map) onEdit;
   ClassTile({
     @required this.classData,
     @required this.classId,
     //@required this.onTap,
     @required this.onDelete,
-   //@required this.onEdit
+    @required this.onEdit
   });
 
   @override
@@ -27,7 +27,7 @@ class ClassTile extends StatelessWidget {
           caption: "Edit",
           color: Colors.orangeAccent,
           icon: Icons.edit,
-          //onTap:() => onDelete(classId),
+          onTap:() => onEdit(classId, classData),
         ),
         IconSlideAction(
           caption: "Delete",

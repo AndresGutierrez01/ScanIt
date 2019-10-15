@@ -30,4 +30,18 @@ class FirestoreTasks {
         .document(classId)
         .delete();
   }
+
+  static void editClass(String classId, String className, String classNumber,
+      String classSection) {
+    Firestore.instance
+        .collection('users')
+        .document(Auth.uid)
+        .collection('classes')
+        .document(classId)
+        .updateData({
+          'name': className,
+          'number': classNumber,
+          'section': classSection,
+        });
+  }
 }

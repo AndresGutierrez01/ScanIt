@@ -9,6 +9,7 @@ import 'package:scanit/widgets/CenterLoad.dart';
 import 'package:scanit/widgets/ClassTile.dart';
 import 'package:scanit/widgets/CreateClassForm.dart';
 import 'package:scanit/widgets/DeleteClassWarning.dart';
+import 'package:scanit/widgets/EditClassForm.dart';
 import 'package:scanit/widgets/SlideLeftRoute.dart';
 import 'package:scanit/widgets/SlideRightRoute.dart';
 
@@ -76,6 +77,32 @@ class _ClassesState extends State<Classes> {
     Navigator.of(context).pop();
   }
 
+  editClassDialog(String classId, Map classData){
+    className.text = classData['name'];
+    classSection.text = classData['section'];
+    classNumber.text = classData['number'];
+    showDialog<void>(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return EditClassForm(
+          nameCtr: className,
+          numberCtr: classNumber,
+          sectionCtr: classSection,
+          onEdit: editClass,
+          classId: classId,
+        );
+      },
+    );
+  }
+
+  editClass(String classId){
+    FirestoreTasks.editClass(
+        classId, className.text, classNumber.text, classSection.text);
+    Navigator.of(context).pop();
+    clearControllers();
+  }
+
   logout() {
     Auth.logout();
     Navigator.of(context).pushReplacement(
@@ -131,6 +158,7 @@ class _ClassesState extends State<Classes> {
                     classData: classDocs[index].data,
                     classId: classDocs[index].documentID,
                     onDelete: deleteWarning,
+                    onEdit: editClassDialog,
                   );
                 },
               );
