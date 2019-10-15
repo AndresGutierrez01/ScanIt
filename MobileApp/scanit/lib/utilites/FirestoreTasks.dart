@@ -14,11 +14,20 @@ class FirestoreTasks {
         .collection('classes')
         .document()
         .setData({
-          'name': className,
-          'number': classNumber,
-          'section': classSection,
-          'testCount': 0,
-          'studentCount': 0, 
-        });
+      'name': className,
+      'number': classNumber,
+      'section': classSection,
+      'testCount': 0,
+      'studentCount': 0,
+    });
+  }
+
+  static void deleteClass(String classId) {
+    Firestore.instance
+        .collection('users')
+        .document(Auth.uid)
+        .collection('classes')
+        .document(classId)
+        .delete();
   }
 }

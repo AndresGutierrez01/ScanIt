@@ -8,6 +8,7 @@ import 'package:scanit/utilites/FirestoreTasks.dart';
 import 'package:scanit/widgets/CenterLoad.dart';
 import 'package:scanit/widgets/ClassTile.dart';
 import 'package:scanit/widgets/CreateClassForm.dart';
+import 'package:scanit/widgets/DeleteClassWarning.dart';
 import 'package:scanit/widgets/SlideLeftRoute.dart';
 import 'package:scanit/widgets/SlideRightRoute.dart';
 
@@ -47,6 +48,31 @@ class _ClassesState extends State<Classes> {
   createClass() {
     FirestoreTasks.createClass(
         className.text, classNumber.text, classSection.text);
+    Navigator.of(context).pop();
+    clearControllers();
+  }
+
+  clearControllers() {
+    className.clear();
+    classNumber.clear();
+    classSection.clear();
+  }
+
+  deleteWarning(String classId) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return DeleteClassWarning(
+          classId: classId,
+          onDelete: deleteClass,
+        );
+      },
+    );
+  }
+
+  deleteClass(String classId) {
+    FirestoreTasks.deleteClass(classId);
     Navigator.of(context).pop();
   }
 
@@ -103,7 +129,8 @@ class _ClassesState extends State<Classes> {
                 itemBuilder: (context, index) {
                   return ClassTile(
                     classData: classDocs[index].data,
-                    classId: 'asdfsd',
+                    classId: classDocs[index].documentID,
+                    onDelete: deleteWarning,
                   );
                 },
               );

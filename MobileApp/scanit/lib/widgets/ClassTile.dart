@@ -6,13 +6,13 @@ class ClassTile extends StatelessWidget {
   final Map classData;
   final String classId;
   //final Function(String) onTap;
-  //final Function(String) onDelete;
+  final Function(String) onDelete;
   //final Function(String) onEdit;
   ClassTile({
     @required this.classData,
     @required this.classId,
     //@required this.onTap,
-    //@required this.onDelete,
+    @required this.onDelete,
    //@required this.onEdit
   });
 
@@ -33,7 +33,7 @@ class ClassTile extends StatelessWidget {
           caption: "Delete",
           color: Colors.redAccent,
           icon: Icons.delete,
-          //onTap:() => onDelete(classId),
+          onTap:() => onDelete(classId),
         )
       ],
       child: GestureDetector(
