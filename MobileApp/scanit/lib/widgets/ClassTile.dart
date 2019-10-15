@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:scanit/utilites/AppColors.dart';
 
 class ClassTile extends StatelessWidget {
   final Map classData;
   final String classId;
+  //final Function(String) onTap;
+  //final Function(String) onDelete;
+  //final Function(String) onEdit;
   ClassTile({
     @required this.classData,
     @required this.classId,
+    //@required this.onTap,
+    //@required this.onDelete,
+   //@required this.onEdit
   });
 
   @override
@@ -14,7 +21,14 @@ class ClassTile extends StatelessWidget {
     return Slidable(
       actionPane: SlidableDrawerActionPane(),
       actionExtentRatio: 0.25,
+ 
       secondaryActions: <Widget>[
+        IconSlideAction(
+          caption: "Edit",
+          color: Colors.orangeAccent,
+          icon: Icons.edit,
+          //onTap:() => onDelete(classId),
+        ),
         IconSlideAction(
           caption: "Delete",
           color: Colors.redAccent,
@@ -23,25 +37,87 @@ class ClassTile extends StatelessWidget {
         )
       ],
       child: GestureDetector(
-       // onTap: () => onTap(classId),
+        // onTap: () => onTap(classId),
         child: Container(
-          padding: EdgeInsets.all(10),
-          margin: EdgeInsets.all(10),
-          child: ListTile(
-            title: Text(
-              classData['name'],
-              style: TextStyle(fontSize: 14),
-            ),
-            leading: Text(
-              classData["number"].toString(),
-              style: TextStyle(
-                //fontFamily: "Arvo",
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
-                color: Colors.blue
-              ),
-            ),
-          ),
+            margin: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(10)),
+            child: Column(
+              children: <Widget>[
+                Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        color: AppColors.aqua,
+                        borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(10),
+                            topLeft: Radius.circular(10))),
+                    width: 1.0 / 0.0,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(classData['name'],
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.white)),
+                            Text(classData['number'].toString(),
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Arvo',
+                                    color: AppColors.background))
+                          ],
+                        ),
+                        Text("section: ${classData['section']}",
+                        style: TextStyle(color: AppColors.white),)
+                      ],
+                    )
+                ),
+                Padding(padding: EdgeInsets.all(10),),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Column(
+                      children: <Widget>[
+                        Text("Tests",
+                        style: TextStyle(
+                          color: AppColors.primaryBlue,
+                          fontWeight: FontWeight.bold
+                        ),
+                        ),
+                        Text("${classData['testCount']}",
+                        style: TextStyle(
+                          fontFamily: "Arvo",
+                          fontSize: 52,
+                          color: AppColors.background
+                        ),
+                        )
+                      ],
+                    ),
+                    Column(
+                      children: <Widget>[
+                        Text("Students",
+                        style: TextStyle(
+                          color: AppColors.primaryBlue,
+                          fontWeight: FontWeight.bold,
+                        ),),
+                        Text("${classData['studentCount']}",
+                        style: TextStyle(
+                          fontFamily: "Arvo",
+                          fontSize: 52,
+                          color: AppColors.background
+                        )),
+                      ],
+                    )
+                  ],
+                ),
+                Padding(padding: EdgeInsets.all(10),)
+              ],
+            )
         ),
       ),
     );
