@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/block_picker.dart';
 import 'package:scanit/utilites/AppColors.dart';
 
 class EditClassForm extends StatelessWidget {
@@ -6,13 +7,17 @@ class EditClassForm extends StatelessWidget {
   final TextEditingController numberCtr;
   final TextEditingController sectionCtr;
   final Function(String) onEdit;
+  final Function(Color) onColor;
   final String classId;
+  final Color color;
   EditClassForm({
     @required this.nameCtr,
     @required this.numberCtr,
     @required this.sectionCtr,
     @required this.onEdit,
-    @required this.classId
+    @required this.classId,
+    @required this.onColor,
+    @required this.color
   });
 
   @override
@@ -60,6 +65,24 @@ class EditClassForm extends StatelessWidget {
                     border: InputBorder.none),
               ),
               Divider(color: AppColors.white, height: 0,),
+              Container(
+                height: 120,
+                margin: EdgeInsets.all(20),
+                child: BlockPicker(
+                  pickerColor: color,
+                  onColorChanged: onColor,
+                  availableColors: [
+                    AppColors.aqua,
+                    Colors.deepOrange,
+                    Colors.deepPurple,
+                    Colors.green,
+                    Colors.redAccent,
+                    Colors.blueAccent,
+                    Colors.pinkAccent,
+                    Colors.black,
+                  ],
+                ),
+              ),
             ],
           ),
         ),

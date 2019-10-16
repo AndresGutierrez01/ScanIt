@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:scanit/utilites/AppColors.dart';
 
+
 class Class extends StatefulWidget {
   final String title;
   final String id;

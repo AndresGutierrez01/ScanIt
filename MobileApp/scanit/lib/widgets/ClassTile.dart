@@ -48,7 +48,7 @@ class ClassTile extends StatelessWidget {
                 Container(
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                        color: AppColors.aqua,
+                        color: Color(classData['color']),
                         borderRadius: BorderRadius.only(
                             topRight: Radius.circular(10),
                             topLeft: Radius.circular(10))),

@@ -7,7 +7,7 @@ class FirestoreTasks {
   }
 
   static void createClass(
-      String className, String classNumber, String classSection) {
+      String className, String classNumber, String classSection, int color) {
     Firestore.instance
         .collection('users')
         .document(Auth.uid)
@@ -19,6 +19,7 @@ class FirestoreTasks {
       'section': classSection,
       'testCount': 0,
       'studentCount': 0,
+      'color': color
     });
   }
 
@@ -32,7 +33,7 @@ class FirestoreTasks {
   }
 
   static void editClass(String classId, String className, String classNumber,
-      String classSection) {
+      String classSection, int color) {
     Firestore.instance
         .collection('users')
         .document(Auth.uid)
@@ -42,6 +43,7 @@ class FirestoreTasks {
           'name': className,
           'number': classNumber,
           'section': classSection,
+          'color': color
         });
   }
 }

@@ -23,6 +23,7 @@ class _ClassesState extends State<Classes> {
   final TextEditingController className = TextEditingController(text: "");
   final TextEditingController classNumber = TextEditingController(text: "");
   final TextEditingController classSection = TextEditingController(text: "");
+  Color classColor;
 
   choiceAction(value) {
     if (value == 0) {
@@ -34,6 +35,7 @@ class _ClassesState extends State<Classes> {
 
   createClassDialog() {
     clearControllers();
+    classColor = AppColors.aqua;
     showDialog<void>(
       barrierDismissible: false,
       context: context,
@@ -43,14 +45,19 @@ class _ClassesState extends State<Classes> {
           numberCtr: classNumber,
           sectionCtr: classSection,
           onCreate: createClass,
+          onColor: onColor,
         );
       },
     );
   }
 
+  onColor(Color color){
+    classColor = color;
+  }
+
   createClass() {
     FirestoreTasks.createClass(
-        className.text, classNumber.text, classSection.text);
+        className.text, classNumber.text, classSection.text, classColor.value);
     Navigator.of(context).pop();
     clearControllers();
   }
@@ -83,6 +90,8 @@ class _ClassesState extends State<Classes> {
     className.text = classData['name'];
     classSection.text = classData['section'];
     classNumber.text = classData['number'];
+    classColor = Color(classData['color']);
+
     showDialog<void>(
       barrierDismissible: false,
       context: context,
@@ -93,6 +102,8 @@ class _ClassesState extends State<Classes> {
           sectionCtr: classSection,
           onEdit: editClass,
           classId: classId,
+          onColor: onColor,
+          color: classColor,
         );
       },
     );
@@ -100,7 +111,7 @@ class _ClassesState extends State<Classes> {
 
   editClass(String classId) {
     FirestoreTasks.editClass(
-        classId, className.text, classNumber.text, classSection.text);
+        classId, className.text, classNumber.text, classSection.text, classColor.value);
     Navigator.of(context).pop();
   }
 
