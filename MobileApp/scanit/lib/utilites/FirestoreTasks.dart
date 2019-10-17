@@ -6,6 +6,9 @@ class FirestoreTasks {
     Firestore.instance.collection('users').document(uid).setData({});
   }
 
+  static DocumentReference _user =
+      Firestore.instance.collection('users').document(Auth.uid);
+
   static void createClass(
       String className, String classNumber, String classSection, int color) {
     Firestore.instance
@@ -40,10 +43,44 @@ class FirestoreTasks {
         .collection('classes')
         .document(classId)
         .updateData({
-          'name': className,
-          'number': classNumber,
-          'section': classSection,
-          'color': color
+      'name': className,
+      'number': classNumber,
+      'section': classSection,
+      'color': color
+    });
+  }
+
+  static void addStudent(String classId, String studentName,
+      String studentEmail, String studentId) {
+    Firestore.instance
+        .collection('users')
+        .document(Auth.uid)
+        .collection('classes')
+        .document(classId)
+        .collection('students')
+        .document()
+        .setData({'name': studentName, 'email': studentEmail, 'id': studentId});
+  }
+
+  static void deleteStudent(String classId, String studentId) {
+    _user
+        .collection('classes')
+        .document(classId)
+        .collection('students')
+        .document(studentId)
+        .delete();
+  }
+
+  static void editStudent(String classId, String studentId, String name, String email, String id) {
+    _user
+        .collection('classes')
+        .document(classId)
+        .collection('students')
+        .document(studentId)
+        .updateData({
+          'name': name,
+          'email':email,
+          'id': id
         });
   }
 }
