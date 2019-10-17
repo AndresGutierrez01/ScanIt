@@ -60,6 +60,7 @@ class FirestoreTasks {
         .collection('students')
         .document()
         .setData({'name': studentName, 'email': studentEmail, 'id': studentId});
+    _incStudentCount(classId);
   }
 
   static void deleteStudent(String classId, String studentId) {
@@ -69,7 +70,25 @@ class FirestoreTasks {
         .collection('students')
         .document(studentId)
         .delete();
+    _decStudentCount(classId);
   }
+
+  static void _incStudentCount(String classId) async{
+    DocumentReference classRef = _user.collection('classes').document(classId);
+    DocumentSnapshot classSnap= await classRef.get();
+    classRef.updateData({
+      'studentCount': classSnap.data['studentCount'] += 1
+    });
+  }
+
+  static void _decStudentCount(String classId) async{
+    DocumentReference classRef = _user.collection('classes').document(classId);
+    DocumentSnapshot classSnap= await classRef.get();
+    classRef.updateData({
+      'studentCount': classSnap.data['studentCount'] -= 1
+    });
+  }
+
 
   static void editStudent(String classId, String studentId, String name, String email, String id) {
     _user

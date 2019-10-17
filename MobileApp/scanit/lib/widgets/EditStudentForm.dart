@@ -41,6 +41,7 @@ class EditStudentForm extends StatelessWidget {
               ),
               TextField(
                 controller: emailCtr,
+                keyboardType: TextInputType.emailAddress,
                 style: TextStyle(color: AppColors.aqua),
                 decoration: InputDecoration(
                     prefixIcon: Icon(Icons.email, color: AppColors.gray),
