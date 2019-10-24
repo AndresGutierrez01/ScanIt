@@ -73,33 +73,75 @@ class FirestoreTasks {
     _decStudentCount(classId);
   }
 
-  static void _incStudentCount(String classId) async{
+  static void _incStudentCount(String classId) async {
     DocumentReference classRef = _user.collection('classes').document(classId);
-    DocumentSnapshot classSnap= await classRef.get();
-    classRef.updateData({
-      'studentCount': classSnap.data['studentCount'] += 1
-    });
+    DocumentSnapshot classSnap = await classRef.get();
+    classRef.updateData({'studentCount': classSnap.data['studentCount'] += 1});
   }
 
-  static void _decStudentCount(String classId) async{
+  static void _decStudentCount(String classId) async {
     DocumentReference classRef = _user.collection('classes').document(classId);
-    DocumentSnapshot classSnap= await classRef.get();
-    classRef.updateData({
-      'studentCount': classSnap.data['studentCount'] -= 1
-    });
+    DocumentSnapshot classSnap = await classRef.get();
+    classRef.updateData({'studentCount': classSnap.data['studentCount'] -= 1});
   }
 
-
-  static void editStudent(String classId, String studentId, String name, String email, String id) {
+  static void editStudent(
+      String classId, String studentId, String name, String email, String id) {
     _user
         .collection('classes')
         .document(classId)
         .collection('students')
         .document(studentId)
+        .updateData({'name': name, 'email': email, 'id': id});
+  }
+
+  static void createTest(String classId, String testName) {
+    _user
+        .collection('classes')
+        .document(classId)
+        .collection('tests')
+        .document()
+        .setData({
+      'name': testName,
+      'key': "",
+      'average': 0,
+      'median': 0,
+      'high': 0,
+      'low': 0
+    });
+    _incTestCount(classId);
+  }
+
+  static void editTest(String classId, String testId, String testName) {
+    _user
+        .collection('classes')
+        .document(classId)
+        .collection('tests')
+        .document(testId)
         .updateData({
-          'name': name,
-          'email':email,
-          'id': id
-        });
+      'name': testName,
+    });
+  }
+
+  static void deleteTest(String classId, String testId) {
+    _user
+        .collection('classes')
+        .document(classId)
+        .collection('tests')
+        .document(testId)
+        .delete();
+    _decTestCount(classId);
+  }
+
+  static void _incTestCount(String classId) async {
+    DocumentReference testRef = _user.collection('classes').document(classId);
+    DocumentSnapshot testSnap = await testRef.get();
+    testRef.updateData({'testCount': testSnap.data['testCount'] += 1});
+  }
+
+  static void _decTestCount(String classId) async {
+    DocumentReference testRef = _user.collection('classes').document(classId);
+    DocumentSnapshot testSnap = await testRef.get();
+    testRef.updateData({'testCount': testSnap.data['testCount'] -= 1});
   }
 }

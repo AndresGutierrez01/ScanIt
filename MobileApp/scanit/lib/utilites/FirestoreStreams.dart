@@ -17,4 +17,13 @@ class FirestoreStreams {
         .orderBy('name')
         .snapshots();
   }
+
+  static Stream<QuerySnapshot> testsStream(String classId) {
+    return _user
+        .collection('classes')
+        .document(classId)
+        .collection('tests')
+        .orderBy('name')
+        .snapshots();
+  }
 }
