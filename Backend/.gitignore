@@ -6,3 +6,9 @@
 
 build/
 ScanIt.egg-info/
+
+
+*.pem
+
+
+*env*

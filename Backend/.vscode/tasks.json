@@ -6,7 +6,7 @@
         {
             "label": "Run Flask App",
             "type": "shell",
-            "command": "/usr/local/bin/python /Users/andres/Documents/Computer/scana_workspace/ScanIt/Backend/run.py",
+            "command": "export FLASK_APP=run.py && flask run",
             "problemMatcher": []
         }
     ]
