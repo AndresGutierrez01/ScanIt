@@ -7,8 +7,10 @@ import 'package:scanit/widgets/AddStudentForm.dart';
 import 'package:scanit/widgets/CenterLoad.dart';
 import 'package:scanit/widgets/CreateTestForm.dart';
 import 'package:scanit/widgets/EditStudentForm.dart';
+import 'package:scanit/widgets/EditTestForm.dart';
 import 'package:scanit/widgets/FormButton.dart';
 import 'package:scanit/widgets/StudentTile.dart';
+import 'package:scanit/widgets/TestTile.dart';
 
 class Class extends StatefulWidget {
   final String title;
@@ -81,7 +83,7 @@ class _ClassState extends State<Class> {
     FirestoreTasks.deleteStudent(widget.id, id);
   }
 
-  createTestDialog(){
+  createTestDialog() {
     clearControllers();
     showDialog<void>(
       barrierDismissible: false,
@@ -95,7 +97,31 @@ class _ClassState extends State<Class> {
     );
   }
 
-  createTest(){
+  editTestDialog(String id, Map data){
+    testName.text = data['name'];
+    showDialog<void>(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return EditTestForm(
+          nameCtr: testName,
+          onEdit: () => editTest(id),
+        );
+      },
+    );
+  }
+
+  editTest(String id) {
+    FirestoreTasks.editTest(widget.id, id, testName.text);
+    Navigator.of(context).pop();
+  }
+
+  deleteTest(String id){
+    FirestoreTasks.deleteTest(widget.id, id);
+  }
+
+  createTest() {
+    FirestoreTasks.createTest(widget.id, testName.text);
     Navigator.of(context).pop();
   }
 
@@ -103,6 +129,7 @@ class _ClassState extends State<Class> {
     studentName.clear();
     studentId.clear();
     studentEmail.clear();
+    testName.clear();
   }
 
   @override
@@ -128,12 +155,42 @@ class _ClassState extends State<Class> {
         body: TabBarView(
           children: <Widget>[
             Container(
-              padding: EdgeInsets.all(30),
+              padding: EdgeInsets.only(top: 30, bottom: 30),
               color: AppColors.background,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Text(""),
+                  Container(
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream: FirestoreStreams.testsStream(widget.id),
+                      builder: (context, tests) {
+                        if (tests.hasData) {
+                          List testDocs = tests.data.documents;
+                          if (testDocs.isEmpty) {
+                            return Center(
+                              child: Text("No Tests",
+                                  style: TextStyle(color: AppColors.gray)),
+                            );
+                          }
+                          return Expanded(
+                            child: ListView.builder(
+                              itemCount: testDocs.length,
+                              itemBuilder: (context, index) {
+                                return TestTile(
+                                  testData: testDocs[index].data,
+                                  testId: testDocs[index].documentID,
+                                  onDelete: deleteTest,
+                                  onEdit: editTestDialog,
+                                );
+                              },
+                            ),
+                          );
+                        }
+                        return CenterLoad();
+                      },
+                    ),
+                  ),
+                  Padding(padding: EdgeInsets.all(5),),
                   FormButton(
                     text: ("Create Test"),
                     onTap: createTestDialog,
@@ -177,6 +234,7 @@ class _ClassState extends State<Class> {
                       },
                     ),
                   ),
+                  Padding(padding: EdgeInsets.all(5),),
                   FormButton(
                     text: ("Add Student"),
                     onTap: addStudentDialog,
