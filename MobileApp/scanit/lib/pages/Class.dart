@@ -5,6 +5,7 @@ import 'package:scanit/utilites/FirestoreStreams.dart';
 import 'package:scanit/utilites/FirestoreTasks.dart';
 import 'package:scanit/widgets/AddStudentForm.dart';
 import 'package:scanit/widgets/CenterLoad.dart';
+import 'package:scanit/widgets/CreateTestForm.dart';
 import 'package:scanit/widgets/EditStudentForm.dart';
 import 'package:scanit/widgets/FormButton.dart';
 import 'package:scanit/widgets/StudentTile.dart';
@@ -26,6 +27,7 @@ class _ClassState extends State<Class> {
   final TextEditingController studentName = TextEditingController(text: "");
   final TextEditingController studentId = TextEditingController(text: "");
   final TextEditingController studentEmail = TextEditingController(text: "");
+  final TextEditingController testName = TextEditingController(text: "");
 
   addStudentDialog() {
     clearControllers();
@@ -79,6 +81,24 @@ class _ClassState extends State<Class> {
     FirestoreTasks.deleteStudent(widget.id, id);
   }
 
+  createTestDialog(){
+    clearControllers();
+    showDialog<void>(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return CreateTestForm(
+          nameCtr: testName,
+          onCreate: createTest,
+        );
+      },
+    );
+  }
+
+  createTest(){
+    Navigator.of(context).pop();
+  }
+
   clearControllers() {
     studentName.clear();
     studentId.clear();
@@ -116,7 +136,7 @@ class _ClassState extends State<Class> {
                   Text(""),
                   FormButton(
                     text: ("Create Test"),
-                    onTap: () => {},
+                    onTap: createTestDialog,
                   )
                 ],
               ),
