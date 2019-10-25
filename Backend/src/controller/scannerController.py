@@ -1,4 +1,5 @@
 from flask_restful import Resource, reqparse
+from flask_api import status
 import werkzeug
 from src.scanner_service import format_image, grade_submitted_answers
 
