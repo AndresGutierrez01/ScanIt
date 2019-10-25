@@ -6,3 +6,13 @@
 
 build/
 ScanIt.egg-info/
+
+
+*.pem
+
+
+*env*
+
+
+scantron_images/
+*test_grader.py
