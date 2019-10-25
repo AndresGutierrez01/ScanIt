@@ -12,3 +12,7 @@ ScanIt.egg-info/
 
 
 *env*
+
+
+scantron_images/
+*test_grader.py
