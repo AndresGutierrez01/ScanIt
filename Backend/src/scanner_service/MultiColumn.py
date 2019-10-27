@@ -10,10 +10,39 @@ import os
 
 class ScannerService:
 
+    purple = (133, 29, 219)
+    green = (115, 219, 29)
+    red = (255, 0, 0)
+    pink = (255, 137, 196)
+    orange = (255, 126, 30)
+
+    colors = [purple, green,
+              red, pink, orange]
+
     def __init__(self, image_file):
 
         self.formatted_image = self.format_image(image_file)
-        self.scantron_bubbles = self.get_scantron_bubbles()
+        self.cnts = self.get_contours()
+        self.scantron_questions = self.get_scantron_questions()
+        self.student_id_bubbles = self.get_student_id()
+
+        i = 0
+        for c in self.scantron_questions:
+            cv2.drawContours(
+                self.paper, [c], -1, self.colors[i % len(self.colors)], -1)
+
+            i += 1
+
+        i = 0
+        for c in self.student_id_bubbles:
+            cv2.drawContours(
+                self.paper, [c], -1, self.colors[i % len(self.colors)], -1)
+
+            i += 1
+
+        cv2.imshow('image', self.paper)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
     def format_image(self, image_file):
         image_path = os.path.join(
@@ -51,14 +80,14 @@ class ScannerService:
         # apply a four point perspective transform to both the
         # original image and grayscale image to obtain a top-down
         # birds eye view of the paper
-        paper = four_point_transform(image, docCnt.reshape(4, 2))
+        self.paper = four_point_transform(image, docCnt.reshape(4, 2))
         warped = four_point_transform(gray, docCnt.reshape(4, 2))
 
         # self.warped = warped
         # self.formatted_image = warped
         return warped
 
-    def get_scantron_bubbles(self):
+    def get_contours(self):
         # apply Otsu's thresholding method to binarize the warped
         # piece of paper
         self.thresh = cv2.threshold(self.formatted_image, 0, 255,
@@ -66,15 +95,106 @@ class ScannerService:
 
         # find contours in the thresholded image, then initialize
         # the list of contours that correspond to questions
-        cnts = cv2.findContours(self.thresh.copy(), cv2.RETR_EXTERNAL,
-                                cv2.CHAIN_APPROX_SIMPLE)
-        cnts = imutils.grab_contours(cnts)
+        cnts, heirarchy = cv2.findContours(self.thresh.copy(), cv2.RETR_LIST,
+                                           cv2.CHAIN_APPROX_SIMPLE)
+
+        return cnts
+
+    def get_scantron_questions(self):
+        columns = self.get_columns()
+
+        scantron_questions = []
+
+        # loop through the columns in the scantron and
+        # find their respective bubbles
+        for col in columns:
+            col_bubbles = self.get_scantron_bubbles(col)
+
+            # sort the bubbles from top to bottom
+            col_bubbles = contours.sort_contours(col_bubbles,
+                                                 method="top-to-bottom")[0]
+
+            # iterate through every other 5 contours to get rid of the extra bubble-border
+            # this is to fix the problem with cv2.RETR_EXTERNAL
+            for ind, c in enumerate(range(0, len(col_bubbles), 5)):
+                if ind % 2 == 1:
+                    continue
+                scantron_questions.extend(col_bubbles[c:c+5])
+
+        return scantron_questions
+
+    def get_student_id(self):
+
+        student_id_box = None
+        for c in self.cnts:
+            # compute the bounding box of the contour, then use the
+            # bounding box to derive the aspect ratio
+            (x, y, w, h) = cv2.boundingRect(c)
+            ar = w / float(h)
+
+            # check to see if it is the student_id box
+            if ar > 1.2 and h > 50 and x > 100:
+                student_id_box = c
+
+        id_box_bubbles = self.get_scantron_bubbles(student_id_box)
+
+        id_box_bubbles = contours.sort_contours(id_box_bubbles,
+                                                method="left-to-right")[0]
+
+        # remove the extra bubble-border
+        # this is to fix the problem with cv2.RETR_EXTERNAL
+        student_id_bubbles = [c for c in id_box_bubbles if cv2.boundingRect(c)[
+            2] > 45]
+
+        return student_id_bubbles
+
+    def get_columns(self):
+
+        colCnts = []
+
+        for c in self.cnts:
+            # compute the bounding box of the contour, then use the
+            # bounding box to derive the aspect ratio
+            (x, y, w, h) = cv2.boundingRect(c)
+            ar = w / float(h)
+
+            # check to see if it is a column
+            if ar < .5 and h > 50:
+                colCnts.append(c)
+
+        # sort the contours from left to right
+        colCnts = contours.sort_contours(colCnts,
+                                         method="left-to-right")[0]
+
+        # find and remove the extraneous contours
+        extrColCnts = set()
+        for i in range(len(colCnts)):
+            if i == 0:
+                continue
+
+            x_prev = cv2.boundingRect(colCnts[i-1])[0]
+            x_cur = cv2.boundingRect(colCnts[i])[0]
+
+            if abs(x_prev - x_cur) < 10:
+                extrColCnts.add(i)
+
+        colCnts = [c for i, c in enumerate(colCnts) if i not in extrColCnts]
+
+        return colCnts
+
+    def get_scantron_bubbles(self, bounding_box):
+
         questionCnts = []
 
+        (box_x, box_y, box_w, box_h) = cv2.boundingRect(bounding_box)
+
+        left_bound = box_x
+        right_bound = box_x + box_w
+
         # loop over the contours
-        for c in cnts:
-                # compute the bounding box of the contour, then use the
-                # bounding box to derive the aspect ratio
+        for c in self.cnts:
+            # compute the bounding box of the contour, then use the
+            # bounding box to derive the aspect ratio
             (x, y, w, h) = cv2.boundingRect(c)
             ar = w / float(h)
 
@@ -82,12 +202,10 @@ class ScannerService:
             # should be sufficiently wide, sufficiently tall, and
             # have an aspect ratio approximately equal to 1
             if w >= 20 and h >= 20 and ar >= 0.9 and ar <= 1.1:
-                questionCnts.append(c)
 
-        # sort the question contours top-to-bottom, then initialize
-        # the total number of correct answers
-        questionCnts = contours.sort_contours(questionCnts,
-                                              method="top-to-bottom")[0]
+                if x > left_bound and x+w < right_bound:
+                    questionCnts.append(c)
+                    # cv2.drawContours(self.paper, [c], -1, (0, 255, 0), -1)
 
         return questionCnts
 
@@ -136,5 +254,5 @@ class ScannerService:
 
         return {'result': result, 'bubbled': bubbled}
 
-        # image_path = os.path.join(os.getcwd(), 'scantron_images', 'test_01.jpg')
-        # image = cv2.imread(image_path)
+
+s = ScannerService("")
