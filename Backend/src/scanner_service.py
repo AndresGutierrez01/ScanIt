@@ -17,9 +17,12 @@ class ScannerService:
         self.scantron_questions = self.get_scantron_questions()
 
     def format_image(self, image_file):
-        image_path = os.path.join(
-            os.getcwd(), 'scantron_images', 'Bubble_Sheet_bubbled_id.jpg')
-        image = cv2.imread(image_path)
+         # read image file string data
+        filestr = image_file.read()
+        # convert string data to numpy array
+        npimg = np.fromstring(filestr, np.uint8)
+        # convert numpy array to image
+        image = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         blurred = cv2.GaussianBlur(gray, (5, 5), 0)
         edged = cv2.Canny(blurred, 75, 200)

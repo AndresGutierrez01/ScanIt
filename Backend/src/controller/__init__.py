@@ -1,2 +1,0 @@
-from .recieveImageController import RecieveImageController
-from .ScannerController import ScannerController

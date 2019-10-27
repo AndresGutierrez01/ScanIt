@@ -2,7 +2,6 @@ import os
 from flask_restful import Resource, reqparse
 from flask_api import status
 import werkzeug
-from src.scanner_service import format_image, grade_submitted_answers
 from src.scanner_service import ScannerService
 
 parser = reqparse.RequestParser()
@@ -27,9 +26,6 @@ class ScannerController(Resource):
             return "ERROR: The required parameters are not provided. [key]", status.HTTP_400_BAD_REQUEST
         if id_len is None:
             return "ERROR: The required parameters are not provided. [id-len]", status.HTTP_400_BAD_REQUEST
-
-        # formatted_image = format_image(image)
-        # result = grade_submitted_answers(formatted_image, key)
 
         scanner = ScannerService(image)
         result, submitted = scanner.grade_test(key)
