@@ -1,0 +1,12 @@
+stuff to add
+
+
+
+68:  cnts = cv2.findContours(thresh.copy(), cv2.RETR_LIST,
+                        cv2.CHAIN_APPROX_SIMPLE)
+
+
+
+82:   cv2.rectangle(thresh, (x, y), (x+w, y+h), (0, 255, 0), 2)
+
+
