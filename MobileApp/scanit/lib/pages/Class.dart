@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:scanit/pages/Test.dart';
 import 'package:scanit/utilites/AppColors.dart';
 import 'package:scanit/utilites/FirestoreStreams.dart';
 import 'package:scanit/utilites/FirestoreTasks.dart';
@@ -9,6 +10,7 @@ import 'package:scanit/widgets/CreateTestForm.dart';
 import 'package:scanit/widgets/EditStudentForm.dart';
 import 'package:scanit/widgets/EditTestForm.dart';
 import 'package:scanit/widgets/FormButton.dart';
+import 'package:scanit/widgets/SlideRightRoute.dart';
 import 'package:scanit/widgets/StudentTile.dart';
 import 'package:scanit/widgets/TestTile.dart';
 
@@ -97,7 +99,7 @@ class _ClassState extends State<Class> {
     );
   }
 
-  editTestDialog(String id, Map data){
+  editTestDialog(String id, Map data) {
     testName.text = data['name'];
     showDialog<void>(
       barrierDismissible: false,
@@ -116,13 +118,24 @@ class _ClassState extends State<Class> {
     Navigator.of(context).pop();
   }
 
-  deleteTest(String id){
+  deleteTest(String id) {
     FirestoreTasks.deleteTest(widget.id, id);
   }
 
   createTest() {
     FirestoreTasks.createTest(widget.id, testName.text);
     Navigator.of(context).pop();
+  }
+
+  viewTest(String testId, String testName) {
+    Navigator.of(context).push(
+      SlideRightRoute(
+          widget: Test(
+        name: testName,
+        testId: testId,
+        classId: widget.id,
+      )),
+    );
   }
 
   clearControllers() {
@@ -181,6 +194,7 @@ class _ClassState extends State<Class> {
                                   testId: testDocs[index].documentID,
                                   onDelete: deleteTest,
                                   onEdit: editTestDialog,
+                                  onTap: viewTest,
                                 );
                               },
                             ),
@@ -190,7 +204,9 @@ class _ClassState extends State<Class> {
                       },
                     ),
                   ),
-                  Padding(padding: EdgeInsets.all(5),),
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                  ),
                   FormButton(
                     text: ("Create Test"),
                     onTap: createTestDialog,
@@ -234,7 +250,9 @@ class _ClassState extends State<Class> {
                       },
                     ),
                   ),
-                  Padding(padding: EdgeInsets.all(5),),
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                  ),
                   FormButton(
                     text: ("Add Student"),
                     onTap: addStudentDialog,

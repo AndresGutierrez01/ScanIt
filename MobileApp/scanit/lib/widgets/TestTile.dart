@@ -7,12 +7,15 @@ class TestTile extends StatelessWidget {
   final String testId;
   final Function(String) onDelete;
   final Function(String, Map) onEdit;
+  final Function(String, String) onTap;
 
   TestTile(
       {@required this.testData,
       @required this.testId,
       @required this.onDelete,
-      @required this.onEdit});
+      @required this.onEdit,
+      @required this.onTap
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +37,7 @@ class TestTile extends StatelessWidget {
         )
       ],
       child: GestureDetector(
-        onTap: () => {},
+        onTap: () => onTap(testId, testData['name']),
         child: Container(
           margin: EdgeInsets.all(15),
           padding: EdgeInsets.all(15),
