@@ -145,6 +145,16 @@ class FirestoreTasks {
     testRef.updateData({'testCount': testSnap.data['testCount'] -= 1});
   }
 
+  static Future<String> getTestKey(String classId, String testId) async {
+    DocumentSnapshot test = await _user
+        .collection('classes')
+        .document(classId)
+        .collection('tests')
+        .document(testId)
+        .get();
+    return test.data['key'];
+  }
+
   static void updateTestKey(String classId, String testId, String key) async {
     _user
         .collection('classes')

@@ -8,6 +8,8 @@ import 'package:scanit/widgets/SubmittedAnswersDialog.dart';
 import 'package:scanit/widgets/GradeTile.dart';
 import 'package:scanit/widgets/FormButton.dart';
 
+import '../utilites/FirestoreTasks.dart';
+
 class Test extends StatefulWidget {
   final String testId;
   final String classId;
@@ -22,10 +24,16 @@ class Test extends StatefulWidget {
 class _TestState extends State<Test> {
   @override
   Widget build(BuildContext context) {
-    editKey() {
+    editKey() async {
+      String testKey =
+          await FirestoreTasks.getTestKey(widget.classId, widget.testId);
       Navigator.of(context).push(
         SlideRightRoute(
-            widget: EditKey(classId: widget.classId, testId: widget.testId)),
+            widget: EditKey(
+          classId: widget.classId,
+          testId: widget.testId,
+          testKey: testKey,
+        )),
       );
     }
 

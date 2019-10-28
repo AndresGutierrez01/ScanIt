@@ -7,15 +7,22 @@ import 'package:grouped_buttons/grouped_buttons.dart';
 class EditKey extends StatefulWidget {
   final String testId;
   final String classId;
+  final String testKey;
 
-  EditKey({@required this.testId, @required this.classId});
+  EditKey(
+      {@required this.testId, @required this.classId, @required this.testKey});
 
   @override
-  _EditKeyState createState() => _EditKeyState();
+  _EditKeyState createState() => _EditKeyState(testKey);
 }
 
 class _EditKeyState extends State<EditKey> {
-  List _picked = ['A', 'A', 'A', 'A', 'A'];
+  List _picked;
+
+  _EditKeyState(String testKey){
+    _picked = List<String>.from(testKey.split(''));
+  }
+
   update() {
     FirestoreTasks.updateTestKey(widget.classId, widget.testId, _picked.join());
     Navigator.of(context).pop();
