@@ -103,7 +103,7 @@ class FirestoreTasks {
         .document()
         .setData({
       'name': testName,
-      'key': "",
+      'key': "AAAAA",
       'average': 0,
       'median': 0,
       'high': 0,
@@ -143,5 +143,14 @@ class FirestoreTasks {
     DocumentReference testRef = _user.collection('classes').document(classId);
     DocumentSnapshot testSnap = await testRef.get();
     testRef.updateData({'testCount': testSnap.data['testCount'] -= 1});
+  }
+
+  static void updateTestKey(String classId, String testId, String key) async {
+    _user
+        .collection('classes')
+        .document(classId)
+        .collection('tests')
+        .document(testId)
+        .updateData({'key': key});
   }
 }
