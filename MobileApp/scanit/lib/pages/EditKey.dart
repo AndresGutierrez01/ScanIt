@@ -19,7 +19,7 @@ class EditKey extends StatefulWidget {
 class _EditKeyState extends State<EditKey> {
   List _picked;
 
-  _EditKeyState(String testKey){
+  _EditKeyState(String testKey) {
     _picked = List<String>.from(testKey.split(''));
   }
 
@@ -62,36 +62,46 @@ class _EditKeyState extends State<EditKey> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
               Expanded(
-                  child: ListView.builder(
-                itemCount: _picked.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    leading: Text(
-                      "${index + 1}.",
-                      style:
-                          TextStyle(color: AppColors.white, fontFamily: "Arvo"),
+                child: Container(
+                  padding: EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(20)
                     ),
-                    title: RadioButtonGroup(
-                      orientation: GroupedButtonsOrientation.HORIZONTAL,
-                      //margin: const EdgeInsets.only(left: 12.0),
-                      onSelected: (String selected) => setState(() {
-                        _picked[index] = selected;
-                      }),
-                      labels: <String>["A", "B", "C", "D", "E"],
-                      picked: _picked[index],
-                      activeColor: AppColors.aqua,
-                      itemBuilder: (Radio rb, Text txt, int i) {
-                        return Column(
-                          children: <Widget>[
-                            txt,
-                            rb,
-                          ],
+                    child: ListView.builder(
+                      itemCount: _picked.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          leading: Text(
+                            "${index + 1}.",
+                            style: TextStyle(
+                              color: AppColors.background,
+                                 fontFamily: "Arvo",
+                                 fontSize: 24
+                            ),
+                          ),
+                          title: RadioButtonGroup(
+                            orientation: GroupedButtonsOrientation.HORIZONTAL,
+                            //margin: const EdgeInsets.only(left: 12.0),
+                            onSelected: (String selected) => setState(() {
+                              _picked[index] = selected;
+                            }),
+                            labels: <String>["A", "B", "C", "D", "E"],
+                            picked: _picked[index],
+                            activeColor: AppColors.aqua,
+                            itemBuilder: (Radio rb, Text txt, int i) {
+                              return Column(
+                                children: <Widget>[
+                                  txt,
+                                  rb,
+                                ],
+                              );
+                            },
+                          ),
                         );
                       },
-                    ),
-                  );
-                },
-              )),
+                    )),
+              ),
               Column(
                 children: <Widget>[
                   Container(
