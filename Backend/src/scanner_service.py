@@ -20,68 +20,14 @@ class ScannerService:
               red, pink, orange]
 
     def __init__(self, image_file):
-
-        # self.formatted_image = self.format_image(image_file)
-        self.get_scantron()
-
+        self.scantron = self.get_scantron()
         # self.cnts = self.get_contours()
-        # self.scantron_questions = self.get_scantron_questions()
-
-    def format_image(self, image_file):
-        #  # read image file string data
-        # filestr = image_file.read()
-        # # convert string data to numpy array
-        # npimg = np.fromstring(filestr, np.uint8)
-        # # convert numpy array to image
-        # image = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
-
-        image_path = os.path.join(
-            os.getcwd(), 'scantron_images', 'Bubble_Sheet_pic_06.jpg')
-        image = cv2.imread(image_path)
-
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-        edged = cv2.Canny(blurred, 75, 200)
-
-        self.gray = gray
-
-        # find contours in the edge map, then initialize
-        # the contour that corresponds to the document
-        cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL,
-                                cv2.CHAIN_APPROX_SIMPLE)
-        cnts = imutils.grab_contours(cnts)
-        docCnt = None
-
-        # ensure that at least one contour was found
-        if len(cnts) > 0:
-            # sort the contours according to their size in
-            # descending order
-            cnts = sorted(cnts, key=cv2.contourArea, reverse=True)
-
-            # loop over the sorted contours
-            for c in cnts:
-                # approximate the contour
-                peri = cv2.arcLength(c, True)
-                approx = cv2.approxPolyDP(c, 0.02 * peri, True)
-
-                # if our approximated contour has four points,
-                # then we can assume we have found the paper
-                if len(approx) == 4:
-                    docCnt = approx
-                    break
-
-        # apply a four point perspective transform to both the
-        # original image and grayscale image to obtain a top-down
-        # birds eye view of the paper
-        self.paper = four_point_transform(image, docCnt.reshape(4, 2))
-        warped = four_point_transform(gray, docCnt.reshape(4, 2))
-
-        return warped
+        self.scantron_questions = self.get_scantron_questions()
 
     def get_scantron(self):
 
         image_path = os.path.join(
-            os.getcwd(), 'scantron_images', 'Bubble_Sheet_pic_06.jpg')
+            os.getcwd(), 'scantron_images', 'Bubble_Sheet_pic_04.jpg')
         image = cv2.imread(image_path)
 
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -122,19 +68,58 @@ class ScannerService:
             # and if it matches the aspect ratio we are looking for
             # then we can assume we have found the scantron rectangle
             if len(approx) == 4 and ar > 1.8 and ar < 2.2:
-                print(ar)
-                cv2.drawContours(image, [approx], 0, (133, 29, 219), 3)
-                print((x, y, w, h))
+                # print(ar)
+                # # cv2.drawContours(image, [approx], 0, (133, 29, 219), 3)
+                # print((x, y, w, h))
+                scantronCnt = approx
                 break
 
-        self.scantron_color = four_point_transform(image, approx.reshape(4, 2))
-        scantron = four_point_transform(self.thresh, approx.reshape(4, 2))
+        # apply a four point perspective transform to both the
+        # original image and threshold to obtain a top-down
+        # birds eye view of the scantron
+        self.scantron_color = four_point_transform(
+            image, scantronCnt.reshape(4, 2))
+        scantron = four_point_transform(self.thresh, scantronCnt.reshape(4, 2))
 
-        cv2.imshow('image', scantron_color)
+        return scantron
+
+    def get_columns(self):
+
+        colCnts = []
+
+        for c in self.cnts:
+            # compute the bounding box of the contour, then use the
+            # bounding box to derive the aspect ratio
+            (x, y, w, h) = cv2.boundingRect(c)
+            ar = w / float(h)
+
+            # check to see if it is a column
+            if ar < .5 and h > 50:
+                colCnts.append(c)
+
+        # sort the contours from left to right
+        colCnts = contours.sort_contours(colCnts,
+                                         method="left-to-right")[0]
+
+        # find and remove the extraneous contours
+        extrColCnts = set()
+        for i in range(len(colCnts)):
+            if i == 0:
+                continue
+
+            x_prev = cv2.boundingRect(colCnts[i-1])[0]
+            x_cur = cv2.boundingRect(colCnts[i])[0]
+
+            if abs(x_prev - x_cur) < 10:
+                extrColCnts.add(i)
+
+        colCnts = [c for i, c in enumerate(colCnts) if i not in extrColCnts]
+
+        cv2.imshow('image', self.scantron_color)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-        return scantron
+        return colCnts
 
     def get_contours(self):
         # apply Otsu's thresholding method to binarize the warped
@@ -226,40 +211,6 @@ class ScannerService:
             student_id.append(bubbled[1])
 
         return ''.join([str(s) for s in student_id[:id_len]])
-
-    def get_columns(self):
-
-        colCnts = []
-
-        for c in self.cnts:
-            # compute the bounding box of the contour, then use the
-            # bounding box to derive the aspect ratio
-            (x, y, w, h) = cv2.boundingRect(c)
-            ar = w / float(h)
-
-            # check to see if it is a column
-            if ar < .5 and h > 50:
-                colCnts.append(c)
-
-        # sort the contours from left to right
-        colCnts = contours.sort_contours(colCnts,
-                                         method="left-to-right")[0]
-
-        # find and remove the extraneous contours
-        extrColCnts = set()
-        for i in range(len(colCnts)):
-            if i == 0:
-                continue
-
-            x_prev = cv2.boundingRect(colCnts[i-1])[0]
-            x_cur = cv2.boundingRect(colCnts[i])[0]
-
-            if abs(x_prev - x_cur) < 10:
-                extrColCnts.add(i)
-
-        colCnts = [c for i, c in enumerate(colCnts) if i not in extrColCnts]
-
-        return colCnts
 
     def get_scantron_bubbles(self, bounding_box):
 
