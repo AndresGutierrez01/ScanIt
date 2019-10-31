@@ -21,14 +21,22 @@ class ScannerService:
 
     def __init__(self, image_file):
         self.scantron = self.get_scantron()
-        # self.cnts = self.get_contours()
-        self.scantron_questions = self.get_scantron_questions()
+        self.columnCnts = self.get_column_contours()
+        self.submitted_answers = self.get_submitted_answers()
+        result = self.grade_test([0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0,
+                                  1, 2, 3, 4, 0, 1, 2, 3, 4])
+
+        print(result)
 
     def get_scantron(self):
 
         image_path = os.path.join(
-            os.getcwd(), 'scantron_images', 'Bubble_Sheet_pic_15.jpg')
+            os.getcwd(), 'scantron_images', 'Bubble_Sheet_pic_17.jpg')
         image = cv2.imread(image_path)
+
+        cv2.imshow('image', image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
         # grayscale the image
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -76,15 +84,23 @@ class ScannerService:
             # and if it matches the aspect ratio we are looking for
             # then we can assume we have found the scantron rectangle
             if len(approx) == 4 and ar > 1.8 and ar < 2.2 and h > 100:
+                cv2.drawContours(image, [c], -1, self.colors[0], 3)
                 scantronCnt = approx
                 break
 
+        cv2.imshow('image', image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
         # apply a four point perspective transform to both the
         # original image and threshold to obtain a top-down
         # birds eye view of the scantron
         self.scantron_color = four_point_transform(
             image, scantronCnt.reshape(4, 2))
         scantron = four_point_transform(self.thresh, scantronCnt.reshape(4, 2))
+
+        cv2.imshow('image', self.scantron_color)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
         return scantron
 
@@ -115,20 +131,27 @@ class ScannerService:
             # and if it matches the aspect ratio we are looking for
             # then we can assume we have found a column
             if len(approx) == 4 and ar < .6:
+                cv2.drawContours(self.scantron_color, [
+                                 c], -1, self.colors[1], 3)
                 colCnts.append(approx)
 
         # sort the contours from left to right
         colCnts = contours.sort_contours(colCnts,
                                          method="left-to-right")[0]
 
+        cv2.imshow('image', self.scantron_color)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
         return colCnts
 
-    def get_scantron_bubbles(self, col):
+    def get_bubbles(self, boundingBox):
+
         # dilate the bubbles in the column
         # this will make the lines more prominent and remove
         # imperfections in the contours
         kernel = np.ones((2, 2), np.uint8)
-        dilated = cv2.dilate(col, kernel, iterations=2)
+        dilated = cv2.dilate(boundingBox, kernel, iterations=2)
 
         labels = cv2.connectedComponentsWithStats(dilated)[1]
         np.zeros((dilated.shape[0], dilated.shape[1], 3), np.uint8)
@@ -175,17 +198,13 @@ class ScannerService:
 
         return scantronCnts
 
-    def get_scantron_questions(self):
+    def get_submitted_answers(self):
 
-        # get the individual column contours from the scantron
-        columnCnts = self.get_column_contours()
-
-        scantron_questions = []
+        submitted_answers = []
 
         # loop through the columns in the scantron and
         # find their respective bubbles
-        for col in columnCnts:
-
+        for col in self.columnCnts:
             # apply a four point perspective transform to both the
             # original scantron and threshold to obtain a top-down
             # birds eye view of the column
@@ -193,20 +212,67 @@ class ScannerService:
             cur_col_color = four_point_transform(
                 self.scantron_color, col.reshape(4, 2))
 
-            col_bubbles = self.get_scantron_bubbles(cur_col)
+            # detect the bubbles for the respective column
+            col_bubbles = self.get_bubbles(cur_col)
 
             # sort the bubbles from top to bottom
             col_bubbles = contours.sort_contours(col_bubbles,
                                                  method="top-to-bottom")[0]
 
-            for c in col_bubbles:
-                cv2.drawContours(cur_col_color, [c], -1, self.colors[1])
-
             cv2.imshow('image', cur_col_color)
             cv2.waitKey(0)
             cv2.destroyAllWindows()
 
-        return scantron_questions
+            # go through the bubbles 5 at a time
+            # row by row
+            for i in range(0, len(col_bubbles), 5):
+
+                # sort the bubbles in the row from left to right
+                row = contours.sort_contours(
+                    col_bubbles[i:i + 5], method="left-to-right")[0]
+                bubbled = None
+
+                # loop over the sorted bubbles
+                for (j, c) in enumerate(row):
+                    # construct a mask that reveals only the current
+                    # "bubble" for the question
+                    mask = np.zeros(cur_col.shape, dtype="uint8")
+                    cv2.drawContours(mask, [c], -1, 255, -1)
+
+                    # apply the mask to the thresholded image, then
+                    # count the number of non-zero pixels in the
+                    # bubble area
+                    mask = cv2.bitwise_and(cur_col, cur_col, mask=mask)
+                    total = cv2.countNonZero(mask)
+
+                    # if the current total has a larger number of total
+                    # non-zero pixels, then we are examining the currently
+                    # bubbled-in answer
+                    if bubbled is None or total > bubbled[0]:
+                        bubbled = (total, j, c)
+
+                cv2.drawContours(
+                    cur_col_color, [bubbled[2]], -1, self.colors[2], 3)
+                cv2.imshow('image', cur_col_color)
+                cv2.waitKey(0)
+                cv2.destroyAllWindows()
+
+                submitted_answers.append(bubbled[1])
+
+        return submitted_answers
+
+    def grade_test(self, key):
+
+        # convert key to array of integers
+        key = [int(a) for a in key]
+
+        correct = 0
+        result = {}
+
+        for index, (s, k) in enumerate(zip(self.submitted_answers, key)):
+            result[index] = s == k
+
+        return result, {i: s for i, s in enumerate(self.submitted_answers)}
 
     def get_student_id(self, id_len):
 
@@ -221,7 +287,7 @@ class ScannerService:
             if ar > 1.2 and h > 50 and x > 100:
                 student_id_box = c
 
-        id_box_bubbles = self.get_scantron_bubbles(student_id_box)
+        id_box_bubbles = self.get_bubbles(student_id_box)
 
         id_box_bubbles = contours.sort_contours(id_box_bubbles,
                                                 method="left-to-right")[0]
@@ -263,49 +329,6 @@ class ScannerService:
             student_id.append(bubbled[1])
 
         return ''.join([str(s) for s in student_id[:id_len]])
-
-    def grade_test(self, key):
-
-        # convert key to array of integers
-        key = [int(a) for a in key]
-
-        correct = 0
-        submitted = []
-
-        # each question has 5 possible answers, to loop over the
-        # question in batches of 5
-        for (q, i) in enumerate(np.arange(0, len(self.scantron_questions), 5)):
-            # sort the contours for the current question from
-            # left to right, then initialize the index of the
-            # bubbled answer
-            cnts = contours.sort_contours(self.scantron_questions[i:i + 5])[0]
-            bubbled = None
-            # loop over the sorted contours
-            for (j, c) in enumerate(cnts):
-                # construct a mask that reveals only the current
-                # "bubble" for the question
-                mask = np.zeros(self.thresh.shape, dtype="uint8")
-                cv2.drawContours(mask, [c], -1, 255, -1)
-
-                # apply the mask to the thresholded image, then
-                # count the number of non-zero pixels in the
-                # bubble area
-                mask = cv2.bitwise_and(self.thresh, self.thresh, mask=mask)
-                total = cv2.countNonZero(mask)
-
-                # if the current total has a larger number of total
-                # non-zero pixels, then we are examining the currently
-                # bubbled-in answer
-                if bubbled is None or total > bubbled[0]:
-                    bubbled = (total, j)
-
-            submitted.append(bubbled[1])
-
-        result = {}
-        for index, (s, k) in enumerate(zip(submitted, key)):
-            result[index] = s == k
-
-        return result, {i: s for i, s in enumerate(submitted)}
 
 
 ScannerService('')
