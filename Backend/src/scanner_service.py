@@ -22,12 +22,13 @@ class ScannerService:
     def __init__(self, image_file):
         self.scantron = self.get_scantron()
         # self.cnts = self.get_contours()
-        self.scantron_questions = self.get_scantron_questions()
+        # self.scantron_questions = self.get_scantron_questions()
+        self.get_columns()
 
     def get_scantron(self):
 
         image_path = os.path.join(
-            os.getcwd(), 'scantron_images', 'Bubble_Sheet_pic_04.jpg')
+            os.getcwd(), 'scantron_images', 'Bubble_Sheet_pic_13.jpg')
         image = cv2.imread(image_path)
 
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -40,7 +41,7 @@ class ScannerService:
         # dilate the image
         # this will make the lines more prominent and remove
         # imperfections in the contours
-        kernel = np.ones((1, 1), np.uint8)
+        kernel = np.ones((2, 2), np.uint8)
         dilated = cv2.dilate(self.thresh, kernel, iterations=3)
 
         # find contours in the thresholded image
@@ -51,6 +52,9 @@ class ScannerService:
         # sort the contours according to their size in
         # descending order
         cnts = sorted(cnts, key=cv2.contourArea, reverse=True)
+
+        # initialize scantronCnt
+        scantronCnt = None
 
         # loop over the sorted contours
         for c in cnts:
@@ -64,13 +68,14 @@ class ScannerService:
             epsilon = 0.1*cv2.arcLength(c, True)
             approx = cv2.approxPolyDP(c, epsilon, True)
 
+            # initialize scantronCnt just incase no better contour is found
+            if x > 0 and scantronCnt is None:
+                scantronCnt = approx
+
             # if our approximated contour has four points
             # and if it matches the aspect ratio we are looking for
             # then we can assume we have found the scantron rectangle
-            if len(approx) == 4 and ar > 1.8 and ar < 2.2:
-                # print(ar)
-                # # cv2.drawContours(image, [approx], 0, (133, 29, 219), 3)
-                # print((x, y, w, h))
+            if len(approx) == 4 and ar > 1.8 and ar < 2.2 and h > 100:
                 scantronCnt = approx
                 break
 
@@ -85,39 +90,36 @@ class ScannerService:
 
     def get_columns(self):
 
+        # dilate the scantron
+        # this will make the lines more prominent and remove
+        # imperfections in the contours
+        kernel = np.ones((1, 1), np.uint8)
+        dilated = cv2.dilate(self.scantron, kernel, iterations=3)
+
+        # find contours in the dilated scantron
+        cnts, heirarchy = cv2.findContours(dilated.copy(), cv2.RETR_EXTERNAL,
+                                           cv2.CHAIN_APPROX_SIMPLE)
+
         colCnts = []
 
-        for c in self.cnts:
+        for c in cnts:
             # compute the bounding box of the contour, then use the
             # bounding box to derive the aspect ratio
             (x, y, w, h) = cv2.boundingRect(c)
             ar = w / float(h)
 
-            # check to see if it is a column
-            if ar < .5 and h > 50:
+            epsilon = 0.1*cv2.arcLength(c, True)
+            approx = cv2.approxPolyDP(c, epsilon, True)
+
+            # if our approximated contour has four points
+            # and if it matches the aspect ratio we are looking for
+            # then we can assume we have found a column
+            if len(approx) == 4 and ar < .5:
                 colCnts.append(c)
 
         # sort the contours from left to right
         colCnts = contours.sort_contours(colCnts,
                                          method="left-to-right")[0]
-
-        # find and remove the extraneous contours
-        extrColCnts = set()
-        for i in range(len(colCnts)):
-            if i == 0:
-                continue
-
-            x_prev = cv2.boundingRect(colCnts[i-1])[0]
-            x_cur = cv2.boundingRect(colCnts[i])[0]
-
-            if abs(x_prev - x_cur) < 10:
-                extrColCnts.add(i)
-
-        colCnts = [c for i, c in enumerate(colCnts) if i not in extrColCnts]
-
-        cv2.imshow('image', self.scantron_color)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
 
         return colCnts
 
