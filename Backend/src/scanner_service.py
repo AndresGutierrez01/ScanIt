@@ -10,22 +10,40 @@ import os
 
 class ScannerService:
 
+    purple = (133, 29, 219)
+    green = (115, 219, 29)
+    red = (255, 0, 0)
+    pink = (255, 137, 196)
+    orange = (255, 126, 30)
+
+    colors = [purple, green,
+              red, pink, orange]
+
     def __init__(self, image_file):
 
-        self.formatted_image = self.format_image(image_file)
-        self.cnts = self.get_contours()
-        self.scantron_questions = self.get_scantron_questions()
+        # self.formatted_image = self.format_image(image_file)
+        self.get_scantron()
+
+        # self.cnts = self.get_contours()
+        # self.scantron_questions = self.get_scantron_questions()
 
     def format_image(self, image_file):
-         # read image file string data
-        filestr = image_file.read()
-        # convert string data to numpy array
-        npimg = np.fromstring(filestr, np.uint8)
-        # convert numpy array to image
-        image = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+        #  # read image file string data
+        # filestr = image_file.read()
+        # # convert string data to numpy array
+        # npimg = np.fromstring(filestr, np.uint8)
+        # # convert numpy array to image
+        # image = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+
+        image_path = os.path.join(
+            os.getcwd(), 'scantron_images', 'Bubble_Sheet_pic_06.jpg')
+        image = cv2.imread(image_path)
+
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         blurred = cv2.GaussianBlur(gray, (5, 5), 0)
         edged = cv2.Canny(blurred, 75, 200)
+
+        self.gray = gray
 
         # find contours in the edge map, then initialize
         # the contour that corresponds to the document
@@ -60,10 +78,68 @@ class ScannerService:
 
         return warped
 
+    def get_scantron(self):
+
+        image_path = os.path.join(
+            os.getcwd(), 'scantron_images', 'Bubble_Sheet_pic_06.jpg')
+        image = cv2.imread(image_path)
+
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        # apply Otsu's thresholding method to binarize the warped
+        # piece of paper
+        self.thresh = cv2.threshold(gray, 0, 255,
+                                    cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+
+        # dilate the image
+        # this will make the lines more prominent and remove
+        # imperfections in the contours
+        kernel = np.ones((1, 1), np.uint8)
+        dilated = cv2.dilate(self.thresh, kernel, iterations=3)
+
+        # find contours in the thresholded image
+        cnts, heirarchy = cv2.findContours(dilated.copy(), cv2.RETR_LIST,
+                                           cv2.CHAIN_APPROX_SIMPLE)
+
+        # TODO add if statement to check if at least one contour is found
+        # sort the contours according to their size in
+        # descending order
+        cnts = sorted(cnts, key=cv2.contourArea, reverse=True)
+
+        # loop over the sorted contours
+        for c in cnts:
+
+            # compute the bounding box of the contour, then use the
+            # bounding box to derive the aspect ratio
+            (x, y, w, h) = cv2.boundingRect(c)
+            ar = w / float(h)
+
+            # approximate the contour
+            epsilon = 0.1*cv2.arcLength(c, True)
+            approx = cv2.approxPolyDP(c, epsilon, True)
+
+            # if our approximated contour has four points
+            # and if it matches the aspect ratio we are looking for
+            # then we can assume we have found the scantron rectangle
+            if len(approx) == 4 and ar > 1.8 and ar < 2.2:
+                print(ar)
+                cv2.drawContours(image, [approx], 0, (133, 29, 219), 3)
+                print((x, y, w, h))
+                break
+
+        self.scantron_color = four_point_transform(image, approx.reshape(4, 2))
+        scantron = four_point_transform(self.thresh, approx.reshape(4, 2))
+
+        cv2.imshow('image', scantron_color)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+        return scantron
+
     def get_contours(self):
         # apply Otsu's thresholding method to binarize the warped
         # piece of paper
-        self.thresh = cv2.threshold(self.formatted_image, 0, 255,
+        self.thresh = cv2.threshold(self.image, 0, 255,
                                     cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
 
         # find contours in the thresholded image, then initialize
@@ -253,3 +329,6 @@ class ScannerService:
             result[index] = s == k
 
         return result, {i: s for i, s in enumerate(submitted)}
+
+
+ScannerService('')
