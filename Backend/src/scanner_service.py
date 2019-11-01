@@ -235,7 +235,7 @@ class ScannerService:
         for index, (s, k) in enumerate(zip(self.submitted_answers, key)):
             result[index+1] = s == k
 
-        return result, {i+1: AnswerChoice[s] for i, s in enumerate(self.submitted_answers)}
+        return result, ''.join([AnswerChoice[s] for s in self.submitted_answers])
 
     def get_student_id(self, id_len):
 

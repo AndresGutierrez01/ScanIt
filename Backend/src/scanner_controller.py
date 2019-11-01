@@ -28,7 +28,7 @@ class ScannerController(Resource):
             return "ERROR: The required parameters are not provided. [id-len]", status.HTTP_400_BAD_REQUEST
 
         scanner = ScannerService(image)
-        result, submitted = scanner.grade_test(key)
+        result, submission = scanner.grade_test(key)
         student_id = scanner.get_student_id(id_len)
 
-        return {'result': result, 'submitted': submitted, 'student-id': student_id}, 200
+        return {'result': result, 'submission': submission, 'student-id': student_id}, 200
