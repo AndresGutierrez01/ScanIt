@@ -11,7 +11,7 @@ import 'package:scanit/widgets/SlideRightRoute.dart';
 import 'package:scanit/widgets/SubmittedAnswersDialog.dart';
 import 'package:scanit/widgets/GradeTile.dart';
 import 'package:scanit/widgets/FormButton.dart';
-import 'package:dio/dio.dart';
+import 'package:http/http.dart' as http;
 
 class Test extends StatefulWidget {
   final String testId;
@@ -32,15 +32,22 @@ class _TestState extends State<Test> {
       return;
     }
 
-    String api = "";
+    String api = "http://18.216.41.122:8080/grade";
     String testKey =
         await FirestoreTasks.getTestKey(widget.classId, widget.testId);
-    FormData fd= FormData();
-    fd.add('submission', UploadFileInfo(imageScan, imageScan.path));
-    fd.add('key', testKey);
-    fd.add('id-len', 8);
-    //Response r =  await Dio().post(api, data:fd);
-    //print(r.data);
+
+    Map formData = {
+      'submission': imageScan,
+      'key': testKey,
+      'id-len': 8,
+      'num-questions': testKey.length
+    };
+
+    var client = new http.Client();
+    http.Response r = await client.post(api);
+    print(r.body);
+    
+    
   }
 
   editKey() async {
