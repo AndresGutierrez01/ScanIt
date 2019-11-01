@@ -48,25 +48,30 @@ class _TestState extends State<Test> {
       },
     );
 
-    Map formData = {
-      'submission': imageScan,
-      'key': testKey,
-      'id-len': 8,
-      'num-questions': testKey.length
-    };
-
     var stream =
         new http.ByteStream(DelegatingStream.typed(imageScan.openRead()));
     var length = await imageScan.length();
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     request.fields['id-len'] = '10';
-    request.fields['key'] = '01923919837491240193';
+    request.fields['key'] = 'ABCDEABCDEABCDEABCDE';
     var multipartFile = new http.MultipartFile('submission', stream, length,
         filename: basename(imageScan.path));
     request.files.add(multipartFile);
     request.send().then((response) async {
-      print(await response.stream.bytesToString());
+      String responseString = await response.stream.bytesToString();
+      print(responseString);
+
+      Map<String, dynamic> responseJSON = jsonDecode(responseString);
+      String submission = responseJSON['submission'];
+
       Navigator.of(context).pop();
+      showDialog<void>(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return SubmittedAnswersDialog(submission: submission.split(''));
+        },
+      );
     });
   }
 
