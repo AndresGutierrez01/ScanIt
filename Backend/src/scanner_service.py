@@ -10,33 +10,19 @@ import os
 
 class ScannerService:
 
-    purple = (133, 29, 219)
-    green = (115, 219, 29)
-    red = (255, 0, 0)
-    pink = (255, 137, 196)
-    orange = (255, 126, 30)
-
-    colors = [purple, green,
-              red, pink, orange]
-
     def __init__(self, image_file):
-        self.scantron = self.get_scantron()
+        self.scantron = self.get_scantron(image_file)
         self.columnCnts = self.get_column_contours()
         self.submitted_answers = self.get_submitted_answers()
-        result = self.grade_test([0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0,
-                                  1, 2, 3, 4, 0, 1, 2, 3, 4])
 
-        print(result)
+    def get_scantron(self, image_file):
 
-    def get_scantron(self):
-
-        image_path = os.path.join(
-            os.getcwd(), 'scantron_images', 'Bubble_Sheet_pic_17.jpg')
-        image = cv2.imread(image_path)
-
-        cv2.imshow('image', image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        # read image file string data
+        filestr = image_file.read()
+        # convert string data to numpy array
+        npimg = np.fromstring(filestr, np.uint8)
+        # convert numpy array to image
+        image = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
 
         # grayscale the image
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -84,23 +70,15 @@ class ScannerService:
             # and if it matches the aspect ratio we are looking for
             # then we can assume we have found the scantron rectangle
             if len(approx) == 4 and ar > 1.8 and ar < 2.2 and h > 100:
-                cv2.drawContours(image, [c], -1, self.colors[0], 3)
                 scantronCnt = approx
                 break
 
-        cv2.imshow('image', image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
         # apply a four point perspective transform to both the
         # original image and threshold to obtain a top-down
         # birds eye view of the scantron
         self.scantron_color = four_point_transform(
             image, scantronCnt.reshape(4, 2))
         scantron = four_point_transform(self.thresh, scantronCnt.reshape(4, 2))
-
-        cv2.imshow('image', self.scantron_color)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
 
         return scantron
 
@@ -131,17 +109,11 @@ class ScannerService:
             # and if it matches the aspect ratio we are looking for
             # then we can assume we have found a column
             if len(approx) == 4 and ar < .6:
-                cv2.drawContours(self.scantron_color, [
-                                 c], -1, self.colors[1], 3)
                 colCnts.append(approx)
 
         # sort the contours from left to right
         colCnts = contours.sort_contours(colCnts,
                                          method="left-to-right")[0]
-
-        cv2.imshow('image', self.scantron_color)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
 
         return colCnts
 
@@ -209,7 +181,7 @@ class ScannerService:
             # original scantron and threshold to obtain a top-down
             # birds eye view of the column
             cur_col = four_point_transform(self.scantron, col.reshape(4, 2))
-            cur_col_color = four_point_transform(
+            self.cur_col_color = four_point_transform(
                 self.scantron_color, col.reshape(4, 2))
 
             # detect the bubbles for the respective column
@@ -218,10 +190,6 @@ class ScannerService:
             # sort the bubbles from top to bottom
             col_bubbles = contours.sort_contours(col_bubbles,
                                                  method="top-to-bottom")[0]
-
-            cv2.imshow('image', cur_col_color)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
 
             # go through the bubbles 5 at a time
             # row by row
@@ -249,13 +217,7 @@ class ScannerService:
                     # non-zero pixels, then we are examining the currently
                     # bubbled-in answer
                     if bubbled is None or total > bubbled[0]:
-                        bubbled = (total, j, c)
-
-                cv2.drawContours(
-                    cur_col_color, [bubbled[2]], -1, self.colors[2], 3)
-                cv2.imshow('image', cur_col_color)
-                cv2.waitKey(0)
-                cv2.destroyAllWindows()
+                        bubbled = (total, j)
 
                 submitted_answers.append(bubbled[1])
 
@@ -276,59 +238,74 @@ class ScannerService:
 
     def get_student_id(self, id_len):
 
+        # find contours in the dilated scantron
+        cnts, heirarchy = cv2.findContours(self.scantron.copy(), cv2.RETR_EXTERNAL,
+                                           cv2.CHAIN_APPROX_SIMPLE)
+
+        # cnts = sorted(cnts, key=cv2.contourArea, reverse=True)
+        cnts = contours.sort_contours(
+            cnts, method="right-to-left")[0]
+
+        # colCnts = []
         student_id_box = None
-        for c in self.cnts:
+
+        for i, c in enumerate(cnts):
             # compute the bounding box of the contour, then use the
             # bounding box to derive the aspect ratio
             (x, y, w, h) = cv2.boundingRect(c)
             ar = w / float(h)
 
-            # check to see if it is the student_id box
-            if ar > 1.2 and h > 50 and x > 100:
-                student_id_box = c
+            epsilon = 0.1*cv2.arcLength(c, True)
+            approx = cv2.approxPolyDP(c, epsilon, True)
 
-        id_box_bubbles = self.get_bubbles(student_id_box)
+            # if our approximated contour has four points
+            # and if it matches the aspect ratio we are looking for
+            # then we can assume we have found the student id box
+            if ar > 1.0 and ar <= 1.5:
+                student_id_box = approx
+                break
 
+        student_id_box_formatted = four_point_transform(
+            self.scantron, student_id_box.reshape(4, 2))
+        student_id_box_formatted_color = four_point_transform(
+            self.scantron_color, student_id_box.reshape(4, 2))
+
+        id_box_bubbles = self.get_bubbles(student_id_box_formatted)
+
+        # sort the bubbles from left to right
         id_box_bubbles = contours.sort_contours(id_box_bubbles,
                                                 method="left-to-right")[0]
-
-        # remove the extra inner-bubble
-        # this is to fix the problem with cv2.RETR_EXTERNAL
-        student_id_bubbles = [c for c in id_box_bubbles if cv2.boundingRect(c)[
-            2] > 45]
 
         student_id = []
         # each digit has a possible 10 values, to loop over the
         # thing in batches of 10
-        for (q, i) in enumerate(np.arange(0, len(student_id_bubbles), 10)):
+        for (q, i) in enumerate(np.arange(0, len(id_box_bubbles), 10)):
             # sort the contours for the current question from
             # top to bottom, then initialize the index of the
             # bubbled answer
             cnts = contours.sort_contours(
-                student_id_bubbles[i:i + 10], method="top-to-bottom")[0]
+                id_box_bubbles[i:i + 10], method="top-to-bottom")[0]
             bubbled = None
             # loop over the sorted contours
             for (j, c) in enumerate(cnts):
                 # construct a mask that reveals only the current
                 # "bubble" for the question
-                mask = np.zeros(self.thresh.shape, dtype="uint8")
+                mask = np.zeros(student_id_box_formatted.shape, dtype="uint8")
                 cv2.drawContours(mask, [c], -1, 255, -1)
 
                 # apply the mask to the thresholded image, then
                 # count the number of non-zero pixels in the
                 # bubble area
-                mask = cv2.bitwise_and(self.thresh, self.thresh, mask=mask)
+                mask = cv2.bitwise_and(
+                    student_id_box_formatted, student_id_box_formatted, mask=mask)
                 total = cv2.countNonZero(mask)
 
                 # if the current total has a larger number of total
                 # non-zero pixels, then we are examining the currently
                 # bubbled-in answer
                 if bubbled is None or total > bubbled[0]:
-                    bubbled = (total, j)
+                    bubbled = (total, j, c)
 
             student_id.append(bubbled[1])
 
         return ''.join([str(s) for s in student_id[:id_len]])
-
-
-ScannerService('')
