@@ -6,6 +6,7 @@ import argparse
 import imutils
 import cv2
 import os
+from src.answer_choices import AnswerChoice
 
 
 class ScannerService:
@@ -226,15 +227,15 @@ class ScannerService:
     def grade_test(self, key):
 
         # convert key to array of integers
-        key = [int(a) for a in key]
+        key = [AnswerChoice[a] for a in key]
 
         correct = 0
         result = {}
 
         for index, (s, k) in enumerate(zip(self.submitted_answers, key)):
-            result[index] = s == k
+            result[index+1] = s == k
 
-        return result, {i: s for i, s in enumerate(self.submitted_answers)}
+        return result, {i+1: AnswerChoice[s] for i, s in enumerate(self.submitted_answers)}
 
     def get_student_id(self, id_len):
 
