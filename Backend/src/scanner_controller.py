@@ -21,7 +21,7 @@ class ScannerController(Resource):
         id_len = imageParam['id-len']
 
         if image is None:
-            return "ERROR: The required parameters are not provided. [image]", status.HTTP_400_BAD_REQUEST
+            return "ERROR: The required parameters are not provided. [submission]", status.HTTP_400_BAD_REQUEST
         if key is None:
             return "ERROR: The required parameters are not provided. [key]", status.HTTP_400_BAD_REQUEST
         if id_len is None:

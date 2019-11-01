@@ -7,11 +7,16 @@ import 'package:scanit/utilites/AppColors.dart';
 import 'package:scanit/utilites/FirestoreStreams.dart';
 import 'package:scanit/utilites/FirestoreTasks.dart';
 import 'package:scanit/widgets/CenterLoad.dart';
+import 'package:scanit/widgets/PopUpLoadDialog.dart';
 import 'package:scanit/widgets/SlideRightRoute.dart';
 import 'package:scanit/widgets/SubmittedAnswersDialog.dart';
 import 'package:scanit/widgets/GradeTile.dart';
 import 'package:scanit/widgets/FormButton.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:path/path.dart';
+import 'dart:convert';
+import 'package:async/async.dart';
 
 class Test extends StatefulWidget {
   final String testId;
@@ -25,16 +30,23 @@ class Test extends StatefulWidget {
 }
 
 class _TestState extends State<Test> {
-
-  grade() async{
+  grade(context) async {
     File imageScan = await ImagePicker.pickImage(source: ImageSource.camera);
-    if(imageScan == null){
+    if (imageScan == null) {
       return;
     }
 
-    String api = "http://18.216.41.122:8080/grade";
+    String url = "http://18.216.41.122:8080/grade";
     String testKey =
         await FirestoreTasks.getTestKey(widget.classId, widget.testId);
+
+    showDialog<void>(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return PopUpLoadDialog();
+      },
+    );
 
     Map formData = {
       'submission': imageScan,
@@ -43,14 +55,22 @@ class _TestState extends State<Test> {
       'num-questions': testKey.length
     };
 
-    var client = new http.Client();
-    http.Response r = await client.post(api);
-    print(r.body);
-    
-    
+    var stream =
+        new http.ByteStream(DelegatingStream.typed(imageScan.openRead()));
+    var length = await imageScan.length();
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    request.fields['id-len'] = '10';
+    request.fields['key'] = '01923919837491240193';
+    var multipartFile = new http.MultipartFile('submission', stream, length,
+        filename: basename(imageScan.path));
+    request.files.add(multipartFile);
+    request.send().then((response) async {
+      print(await response.stream.bytesToString());
+      Navigator.of(context).pop();
+    });
   }
 
-  editKey() async {
+  editKey(context) async {
     String testKey =
         await FirestoreTasks.getTestKey(widget.classId, widget.testId);
     Navigator.of(context).push(
@@ -63,7 +83,7 @@ class _TestState extends State<Test> {
     );
   }
 
-  showSubmission(submission) {
+  showSubmission(submission, context) {
     showDialog<void>(
       barrierDismissible: false,
       context: context,
@@ -83,7 +103,9 @@ class _TestState extends State<Test> {
         ),
         actions: <Widget>[
           IconButton(
-            onPressed: editKey,
+            onPressed: () {
+              editKey(context);
+            },
             icon: Icon(
               Icons.vpn_key,
               color: AppColors.white,
@@ -113,7 +135,8 @@ class _TestState extends State<Test> {
                             itemBuilder: (context, index) {
                               return GestureDetector(
                                 onTap: () {
-                                  showSubmission(grades[index]['submitted']);
+                                  showSubmission(
+                                      grades[index]['submitted'], context);
                                 },
                                 child: GradeTile(
                                   grade: grades[index],
@@ -126,7 +149,9 @@ class _TestState extends State<Test> {
                       })),
               FormButton(
                 text: ("Grade Test"),
-                onTap: grade,
+                onTap: () {
+                  grade(context);
+                },
               ),
             ],
           )),
